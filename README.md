@@ -2,6 +2,8 @@
 
 SAP S/4HANA 日本EMC関連（EMC_JP / RFFOJP_EMC）向けの、でんさい（densai.net）標準フォーマット通知XMLテストデータを生成するWebアプリケーションです。
 
+**🌐 デモサイト**: https://kmh-no3.github.io/emc-notice-genkit/
+
 ## 概要
 
 このツールは、でんさいネット標準フォーマット XML ver1.3 に準拠した `notice_ACR.ASG.DIV`（発生・譲渡通知）XMLを生成します。ブラウザ上で完結し、入力したデータは自動的にローカルストレージに保存されます。
