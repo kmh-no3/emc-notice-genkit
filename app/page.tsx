@@ -1,65 +1,206 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { HeaderForm } from "@/components/HeaderForm";
+import { DataItemForm } from "@/components/DataItemForm";
+import { XmlPreview } from "@/components/XmlPreview";
+import { PresetSelector } from "@/components/PresetSelector";
+import type { NoticeInput } from "@/lib/densai/schema";
+import { generateNoticeXml } from "@/lib/densai/generate";
+import { getCurrentDate } from "@/lib/densai/format";
+import {
+  saveToLocalStorage,
+  loadFromLocalStorage,
+  clearLocalStorage,
+} from "@/lib/storage";
 
 export default function Home() {
+  const [input, setInput] = useState<NoticeInput>({
+    header: {
+      notice_date: getCurrentDate(),
+      notify_inf: {
+        riyosya_no: "",
+        riyosya_name: "",
+        bank_cd: "",
+        shiten_cd: "",
+        koza_sbt_cd: "1",
+        koza_no: "",
+      },
+    },
+    data: [],
+    encoding: "UTF-8",
+  });
+
+  const [xml, setXml] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+
+  // ローカルストレージから復元
+  useEffect(() => {
+    const saved = loadFromLocalStorage();
+    if (saved) {
+      setInput(saved);
+    }
+  }, []);
+
+  // 自動保存（debounce）
+  useEffect(() => {
+    if (!autoSaveEnabled) return;
+
+    const timer = setTimeout(() => {
+      saveToLocalStorage(input);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [input, autoSaveEnabled]);
+
+  // XML生成
+  const handleGenerate = useCallback(() => {
+    const result = generateNoticeXml(input);
+    if (result.success && result.xml) {
+      setXml(result.xml);
+      setError("");
+    } else {
+      setError(result.error || "XML生成に失敗しました");
+      setXml("");
+    }
+  }, [input]);
+
+  // XMLダウンロード
+  const handleDownload = useCallback(() => {
+    if (!xml) return;
+
+    const blob = new Blob([xml], { type: "application/xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "notice_ACR.ASG.DIV.xml";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }, [xml]);
+
+  // プリセット読み込み
+  const handlePresetSelect = useCallback((preset: NoticeInput) => {
+    setInput(preset);
+    setXml("");
+    setError("");
+  }, []);
+
+  // データクリア
+  const handleClear = useCallback(() => {
+    if (confirm("すべてのデータをクリアしますか？")) {
+      clearLocalStorage();
+      setInput({
+        header: {
+          notice_date: getCurrentDate(),
+          notify_inf: {
+            riyosya_no: "",
+            riyosya_name: "",
+            bank_cd: "",
+            shiten_cd: "",
+            koza_sbt_cd: "1",
+            koza_no: "",
+          },
+        },
+        data: [],
+        encoding: "UTF-8",
+      });
+      setXml("");
+      setError("");
+    }
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="space-y-6">
+        {/* ヘッダ */}
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">
+            でんさい通知XML テストデータ生成ツール
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-muted-foreground">
+            SAP S/4HANA 日本EMC関連のテストデータを作成します
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+
+        {/* プリセット選択とアクション */}
+        <Card>
+          <CardHeader>
+            <CardTitle>クイックアクション</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <PresetSelector onSelect={handlePresetSelect} />
+            <div className="flex gap-2">
+              <Button onClick={handleGenerate}>XML生成</Button>
+              <Button variant="outline" onClick={handleClear}>
+                データをクリア
+              </Button>
+            </div>
+            {error && (
+              <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
+                <strong>エラー:</strong> {error}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* メインコンテンツ */}
+        <Tabs defaultValue="form" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="form">入力フォーム</TabsTrigger>
+            <TabsTrigger value="preview">XMLプレビュー</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="form" className="space-y-6">
+            <HeaderForm
+              value={input.header}
+              onChange={(header) => setInput({ ...input, header })}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+            <Card>
+              <CardContent className="pt-6">
+                <DataItemForm
+                  items={input.data}
+                  onChange={(data) => setInput({ ...input, data })}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="preview">
+            {xml ? (
+              <XmlPreview xml={xml} onDownload={handleDownload} />
+            ) : (
+              <Card>
+                <CardContent className="py-12 text-center text-muted-foreground">
+                  <p>「XML生成」ボタンをクリックしてXMLを生成してください。</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+        </Tabs>
+
+        {/* フッター */}
+        <Card>
+          <CardContent className="py-4 text-sm text-muted-foreground">
+            <p>
+              <strong>注意事項:</strong>
+              このツールで生成したXMLは、SAP EMC_JP (RFFOJP_EMC)
+              でテスト投入するためのものです。
+              <br />
+              実際のでんさいネット標準フォーマット XML ver1.3
+              に準拠しています。
+              <br />
+              入力データは自動的にブラウザのローカルストレージに保存されます。
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

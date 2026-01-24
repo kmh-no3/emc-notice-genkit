@@ -1,36 +1,225 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# でんさい通知XML テストデータ生成ツール
 
-## Getting Started
+SAP S/4HANA 日本EMC関連（EMC_JP / RFFOJP_EMC）向けの、でんさい（densai.net）標準フォーマット通知XMLテストデータを生成するWebアプリケーションです。
 
-First, run the development server:
+## 概要
+
+このツールは、でんさいネット標準フォーマット XML ver1.3 に準拠した `notice_ACR.ASG.DIV`（発生・譲渡通知）XMLを生成します。ブラウザ上で完結し、入力したデータは自動的にローカルストレージに保存されます。
+
+## 主な機能
+
+- ✅ でんさい通知XML（notice_ACR.ASG.DIV）の生成
+- ✅ フォーム入力による簡単なデータ作成
+- ✅ バリデーション機能（桁数、形式チェック）
+- ✅ プリセットサンプルデータ（1件/複数件）
+- ✅ XMLプレビュー機能
+- ✅ XMLファイルダウンロード（UTF-8）
+- ✅ ローカルストレージへの自動保存
+- ✅ 依頼人Ref.No.の自動生成（BUKRS + BELNR + GJAHR）
+
+## 技術スタック
+
+- **フレームワーク**: Next.js 16 (App Router)
+- **言語**: TypeScript
+- **UI**: shadcn/ui + Tailwind CSS
+- **バリデーション**: zod
+- **XML生成**: xmlbuilder2
+- **テスト**: Vitest
+
+## ローカル開発
+
+### 前提条件
+
+- Node.js 20.x 以上
+- npm
+
+### セットアップ
 
 ```bash
+# リポジトリをクローン
+git clone https://github.com/YOUR_USERNAME/emc-notice-genkit.git
+cd emc-notice-genkit
+
+# 依存パッケージをインストール
+npm install
+
+# 開発サーバーを起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで http://localhost:3000 を開きます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### テスト実行
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm test
+```
 
-## Learn More
+### ビルド
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+ビルドされた静的ファイルは `out` ディレクトリに出力されます。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 使用方法
 
-## Deploy on Vercel
+### 1. プリセットデータの読み込み（推奨）
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+初めて使用する場合は、「サンプルデータ」ボタンからプリセットを選択してください：
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **最小必須1件サンプル**: 最小限のフィールドを含む1明細のサンプル
+- **複数明細サンプル（3件）**: 3明細を含むサンプル（合計値計算の確認用）
+
+### 2. データ入力
+
+#### ヘッダ情報
+- **通知日**: YYYYMMDD形式（例: 20260125）
+- **通知先情報**: 利用者番号、銀行/支店/口座情報
+
+#### 明細データ
+各明細に以下を入力：
+- **通知種別**: 01〜08（01:発生記録、02:譲渡記録 等）
+- **義務者情報**: 銀行/支店/口座情報
+- **権利者情報**: 銀行/支店/口座情報
+- **債権金額**: 1〜10桁の数字
+- **支払期日**: YYYYMMDD形式
+- **記録番号**: 最大20文字
+- **電子記録年月日**: YYYYMMDD形式
+
+#### 伝票特定補助（任意）
+SAP伝票との紐付けに使用：
+- **BUKRS**: 会社コード（4桁）
+- **BELNR**: 伝票番号（1〜10桁、自動で10桁に左0埋め）
+- **GJAHR**: 会計年度（4桁）
+
+これらを入力すると、**依頼人Ref.No.**が自動生成されます（18桁）。
+
+### 3. XML生成
+
+「XML生成」ボタンをクリックすると、入力内容がバリデーションされ、XMLが生成されます。
+
+### 4. XMLダウンロード
+
+「XMLプレビュー」タブに切り替えて、「XMLをダウンロード」ボタンをクリックします。`notice_ACR.ASG.DIV.xml` ファイルがダウンロードされます。
+
+## SAP投入手順
+
+1. SAP S/4HANAにログイン
+2. トランザクションコード `EMC_JP`（レポート: RFFOJP_EMC）を起動
+3. 「受信DMEファイル」ブロックで **PCから読み込み** を選択
+4. ダウンロードしたXMLファイルを指定
+5. 実行してログを確認
+6. FI伝票（FB03等）で `BSEG-SGTXT` フィールドが `kiroku_no` に更新されているか確認
+
+## データ仕様
+
+### 自動フォーマット
+
+以下のフィールドは自動的にフォーマットされます：
+
+- **口座番号**: 7桁に左0埋め（例: `1` → `0000001`）
+- **伝票番号**: 10桁に左0埋め（例: `123456` → `0000123456`）
+- **明細件数（sum_num）**: 6桁に左0埋め
+- **合計金額（sum_amnt）**: 12桁に左0埋め
+
+### バリデーション規則
+
+- **日付**: YYYYMMDD形式の8桁数字
+- **銀行コード**: 4桁数字
+- **支店コード**: 3桁数字
+- **口座番号**: 1〜7桁数字
+- **金額**: 1〜10桁数字
+- **記録番号**: 最大20文字
+- **依頼人Ref.No.**: 最大40文字
+
+## 注意事項
+
+### セキュリティ
+
+- このツールはブラウザ上で完結し、サーバーにデータを送信しません
+- 入力データはブラウザのローカルストレージに保存されます
+- **実際の顧客情報や機密情報を入力しないでください**
+- テスト用のダミーデータのみを使用してください
+
+### 制限事項
+
+- 対応業務識別ID: `notice_ACR.ASG.DIV`（発生・譲渡通知）のみ
+- 文字コード: UTF-8のみ対応（Shift_JISは将来拡張予定）
+- SAPへの自動投入機能はありません（手動でEMC_JPに投入してください）
+
+## ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
+
+## 参考資料
+
+- [でんさい標準フォーマット XML ver1.3 仕様書（PDF）](https://www.densai.net/pdf/hyoujyunformat_XML_ver1.3_120717.pdf)
+- SAP S/4HANA 日本EMC関連ドキュメント
+
+## トラブルシューティング
+
+### ビルドエラーが発生する
+
+```bash
+# node_modulesをクリーンアップ
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### テストが失敗する
+
+```bash
+# キャッシュをクリア
+npm test -- --clearCache
+npm test
+```
+
+### GitHub Pagesにデプロイされない
+
+1. GitHubリポジトリの Settings > Pages を開く
+2. Source を「GitHub Actions」に設定
+3. `next.config.ts` の `basePath` がリポジトリ名と一致しているか確認
+
+## 開発者向け情報
+
+### ディレクトリ構造
+
+```
+emc-notice-genkit/
+├── app/                    # Next.js App Router
+│   ├── page.tsx           # メインページ
+│   ├── layout.tsx         # ルートレイアウト
+│   └── globals.css        # グローバルスタイル
+├── components/            # Reactコンポーネント
+│   ├── ui/               # shadcn/ui コンポーネント
+│   ├── HeaderForm.tsx
+│   ├── DataItemForm.tsx
+│   ├── PartyForm.tsx
+│   ├── XmlPreview.tsx
+│   └── PresetSelector.tsx
+├── lib/
+│   ├── densai/           # でんさい関連ロジック
+│   │   ├── schema.ts     # zodスキーマ定義
+│   │   ├── format.ts     # フォーマット関数
+│   │   ├── validate.ts   # バリデーション
+│   │   ├── generate.ts   # XML生成
+│   │   └── presets.ts    # サンプルデータ
+│   ├── storage.ts        # localStorage操作
+│   └── utils.ts          # shadcn/ui用ユーティリティ
+├── __tests__/            # テストコード
+└── .github/workflows/    # GitHub Actions
+```
+
+### カスタマイズ
+
+プリセットデータを追加する場合は、`lib/densai/presets.ts` を編集してください。
+
+## 貢献
+
+バグ報告や機能要望は、GitHubのIssuesで受け付けています。
+
+## サポート
+
+質問や問題がある場合は、GitHubのIssuesで報告してください。
