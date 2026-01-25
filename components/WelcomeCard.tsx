@@ -12,7 +12,7 @@ interface WelcomeCardProps {
 
 export function WelcomeCard({ onLoadSample, onDismiss }: WelcomeCardProps) {
   return (
-    <Card className="border-primary/50 bg-primary/5 animate-fade-in">
+    <Card className="border-primary/30 bg-primary/5 dark:bg-primary/10 animate-fade-in backdrop-blur-xl">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">

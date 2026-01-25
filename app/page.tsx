@@ -10,6 +10,7 @@ import { XmlPreview } from "@/components/XmlPreview";
 import { PresetSelector } from "@/components/PresetSelector";
 import { WelcomeCard } from "@/components/WelcomeCard";
 import { StepIndicator } from "@/components/StepIndicator";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import type { NoticeInput } from "@/lib/densai/schema";
 import { generateNoticeXml } from "@/lib/densai/generate";
 import { getCurrentDate } from "@/lib/densai/format";
@@ -177,16 +178,21 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="space-y-6">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-6xl">
+      <div className="space-y-8">
         {/* ヘッダ */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold">
-            でんさい通知XML テストデータ生成ツール
-          </h1>
-          <p className="text-muted-foreground">
-            SAP S/4HANA 日本EMC関連のテストデータを作成します
-          </p>
+        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+          <div className="space-y-3 flex-1">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
+              でんさい通知XML テストデータ生成ツール
+            </h1>
+            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed">
+              SAP S/4HANA 日本EMC関連のテストデータを作成します
+            </p>
+          </div>
+          <div className="self-start sm:self-auto">
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* ウェルカムカード（初回訪問時のみ） */}

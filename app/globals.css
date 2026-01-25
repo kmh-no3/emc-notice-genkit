@@ -4,48 +4,67 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    /* Professional Blue Theme - Light Mode */
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+    
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 222 47% 11%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --radius: 0.5rem;
+    --popover-foreground: 222 47% 11%;
+    
+    --primary: 217 91% 60%;  /* Blue-500 #3B82F6 */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+    
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
+    
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    /* Professional Blue Theme - Dark Mode */
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+    
+    --popover: 217 33% 17%;
+    --popover-foreground: 210 40% 98%;
+    
+    --primary: 217 91% 60%;  /* Blue-500 #3B82F6 */
+    --primary-foreground: 222 47% 11%;
+    
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+    
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 20% 65%;
+    
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+    
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+    
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -56,20 +75,69 @@
   body {
     background: hsl(var(--background));
     color: hsl(var(--foreground));
+    position: relative;
+  }
+  
+  /* プロフェッショナルグラデーション背景 */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      hsl(210, 40%, 98%) 0%,
+      hsl(214, 32%, 95%) 25%,
+      hsl(217, 91%, 97%) 50%,
+      hsl(214, 32%, 95%) 75%,
+      hsl(210, 40%, 98%) 100%
+    );
+    z-index: -1;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  
+  .dark body::before {
+    background: linear-gradient(
+      135deg,
+      hsl(222, 47%, 11%) 0%,
+      hsl(217, 33%, 14%) 25%,
+      hsl(217, 91%, 15%) 50%,
+      hsl(217, 33%, 14%) 75%,
+      hsl(222, 47%, 11%) 100%
+    );
   }
 }
 
 @layer utilities {
+  /* アニメーション */
   .animate-fade-in {
     animation: fade-in 0.5s ease-out;
   }
 
   .animate-slide-up {
-    animation: slide-up 0.3s ease-out;
+    animation: slide-up 0.4s ease-out;
   }
 
   .animate-bounce-subtle {
     animation: bounce-subtle 1s ease-in-out infinite;
+  }
+  
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(59, 130, 246, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
   }
 
   @keyframes fade-in {
@@ -86,7 +154,7 @@
   @keyframes slide-up {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(24px);
     }
     to {
       opacity: 1;
@@ -102,17 +170,65 @@
       transform: translateY(-5px);
     }
   }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
+  @keyframes glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(59, 130, 246, 0.6);
+    }
+  }
+
+  /* グラスモーフィズム */
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark .glass-card {
+    background-color: rgba(31, 41, 55, 0.8);
+    border-color: rgba(55, 65, 81, 0.5);
+  }
+
+  /* ホバーエフェクト */
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+  
+  .hover-lift:hover {
+    transform: scale(1.02);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  .glow-on-hover {
+    @apply transition-all duration-300;
+  }
+  
+  .glow-on-hover:hover {
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5);
+  }
 
   /* スティッキーアクションバー（モバイル対応） */
   .sticky-actions {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: hsl(var(--background));
+    background: hsl(var(--background) / 0.8);
     padding: 1rem;
     border-bottom: 1px solid hsl(var(--border));
-    backdrop-filter: blur(8px);
-    background-color: hsl(var(--background) / 0.8);
+    backdrop-filter: blur(12px);
   }
 
   /* モバイル最適化 */
@@ -124,6 +240,32 @@
 
     .mobile-full-width {
       width: 100%;
+    }
+    
+    /* モバイルでのグラスモーフィズム最適化 */
+    .glass-card {
+      backdrop-filter: blur(8px);
+    }
+    
+    /* モバイルでのタッチ最適化 */
+    button, a {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+  
+  /* タブレット対応 */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  /* より大きな画面でのレイアウト調整 */
+  @media (min-width: 1280px) {
+    .container {
+      max-width: 1200px;
     }
   }
 }

@@ -18,7 +18,7 @@ export function PresetSelector({ onSelect }: PresetSelectorProps) {
         <span className="text-sm font-semibold">サンプルデータから始める</span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+        <Card className="cursor-pointer hover:border-primary/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20">
           <CardContent className="p-4" onClick={() => onSelect(PRESETS.single)}>
             <div className="flex items-start gap-3">
               <FileText className="h-5 w-5 text-muted-foreground mt-0.5" />
@@ -31,7 +31,7 @@ export function PresetSelector({ onSelect }: PresetSelectorProps) {
             </div>
           </CardContent>
         </Card>
-        <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+        <Card className="cursor-pointer hover:border-primary/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/20">
           <CardContent className="p-4" onClick={() => onSelect(PRESETS.multiple)}>
             <div className="flex items-start gap-3">
               <Files className="h-5 w-5 text-muted-foreground mt-0.5" />
