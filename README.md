@@ -1,36 +1,151 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# でんさい通知XML テストデータ生成ツール
 
-## Getting Started
+SAP S/4HANA 日本EMC関連（EMC_JP / RFFOJP_EMC）向けの、でんさい（densai.net）標準フォーマット通知XMLテストデータを生成するWebアプリケーションです。
 
-First, run the development server:
+**🌐 リポジトリ**: [https://github.com/kmh-no3/emc-notice-genkit](https://github.com/kmh-no3/emc-notice-genkit)
+
+## 概要
+
+このツールは、でんさいネット標準フォーマット XML ver1.3 に準拠した `notice_ACR.ASG.DIV`（発生・譲渡通知）XMLを生成します。ブラウザ上で完結し、2カラムレイアウト（左：入力フォーム、右：sticky XMLプレビュー）で直感的に操作できます。
+
+## 主な機能
+
+* ✅ でんさい通知XML（notice_ACR.ASG.DIV）の生成
+* ✅ 2カラムレイアウト（左：入力フォーム、右：sticky XMLプレビュー）
+* ✅ 明細一覧→選択→編集の流れ
+* ✅ リアルタイムXMLプレビュー
+* ✅ zodベースのバリデーション機能（エラーアンカー付き）
+* ✅ XMLファイルダウンロード（UTF-8）
+* ✅ 依頼人Ref.No.の自動生成（BUKRS + BELNR + GJAHR）
+* ✅ 状態管理（zustand）
+
+## 技術スタック
+
+* **フレームワーク**: Next.js 16 (App Router)
+* **言語**: TypeScript
+* **UI**: shadcn/ui + Tailwind CSS
+* **バリデーション**: zod
+* **状態管理**: zustand
+* **XML生成**: xmlbuilder2
+* **通知**: sonner
+
+## ローカル開発
+
+### 前提条件
+
+* Node.js 20.x 以上
+* npm
+
+### セットアップ
 
 ```bash
+# リポジトリをクローン
+git clone https://github.com/kmh-no3/emc-notice-genkit.git
+cd emc-notice-genkit
+
+# 依存パッケージをインストール
+npm install
+
+# 開発サーバーを起動
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開きます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### ビルド
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+```
 
-## Learn More
+ビルドされたファイルは `.next` ディレクトリに出力されます。
 
-To learn more about Next.js, take a look at the following resources:
+## 使用方法
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 1. データ入力
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### ヘッダ情報
 
-## Deploy on Vercel
+* **会社コード (BUKRS)**: 必須
+* **伝票番号 (BELNR)**: 必須
+* **年度 (GJAHR)**: 必須
+* **伝票日付 (BUDAT)**: YYYYMMDD形式（任意）
+* **依頼人参照番号**: 未入力時は自動生成（BUKRS + BELNR(10) + GJAHR）
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### 通知先情報
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* **銀行コード**: 4桁数字（任意）
+* **支店コード**: 3桁数字（任意）
+* **口座番号**: 1〜7桁数字（任意、出力時に7桁0埋め）
+* **口座名義**: 任意
+
+#### 明細データ
+
+各明細に以下を入力：
+
+* **金額**: 数字（任意）
+* **摘要**: 任意
+* **日付**: YYYYMMDD形式（任意）
+
+### 2. XML生成
+
+入力内容はリアルタイムでバリデーションされ、右側のプレビューペインにXMLが表示されます。
+
+### 3. XMLダウンロード
+
+プレビューペインの「ダウンロード」ボタンをクリックすると、XMLファイルがダウンロードされます。
+
+## データ仕様
+
+### 自動フォーマット
+
+以下のフィールドは自動的にフォーマットされます：
+
+* **口座番号**: 7桁に左0埋め（例: `1` → `0000001`）
+* **伝票番号**: 10桁に左0埋め（例: `123456` → `0000123456`）
+* **明細件数（sum_num）**: 6桁に左0埋め
+* **合計金額（sum_amnt）**: 12桁に左0埋め
+
+### バリデーション規則
+
+* **日付**: YYYYMMDD形式の8桁数字
+* **銀行コード**: 4桁数字
+* **支店コード**: 3桁数字
+* **金額**: 数字のみ
+
+## UI特徴
+
+* **2カラムレイアウト**: PC表示では左にフォーム、右にstickyプレビュー
+* **明細管理**: 一覧表示→選択→編集の流れで直感的に操作
+* **リアルタイムプレビュー**: 入力内容が即座にXMLに反映
+* **エラー表示**: バリデーションエラーを一覧表示し、クリックで該当箇所へスクロール
+
+## 注意事項
+
+### セキュリティ
+
+* このツールはブラウザ上で完結し、サーバーにデータを送信しません
+* **実際の顧客情報や機密情報を入力しないでください**
+* テスト用のダミーデータのみを使用してください
+
+### 制限事項
+
+* 対応業務識別ID: `notice_ACR.ASG.DIV`（発生・譲渡通知）のみ
+* 文字コード: UTF-8のみ対応
+
+## ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
+
+## 参考資料
+
+* でんさい標準フォーマット XML ver1.3 仕様書
+* SAP S/4HANA 日本EMC関連ドキュメント
+
+## 貢献
+
+バグ報告や機能要望は、[GitHubのIssues](https://github.com/kmh-no3/emc-notice-genkit/issues)で受け付けています。
+
+## サポート
+
+質問や問題がある場合は、[GitHubのIssues](https://github.com/kmh-no3/emc-notice-genkit/issues)で報告してください。
