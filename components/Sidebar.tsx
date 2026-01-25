@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FlowSection } from "@/components/sidebar/FlowSection";
 import { QuickActionSection } from "@/components/sidebar/QuickActionSection";
 import { ActionSection } from "@/components/sidebar/ActionSection";
+import { InputFormSection } from "@/components/sidebar/InputFormSection";
 import { cn } from "@/lib/utils";
 import type { NoticeInput } from "@/lib/densai/schema";
 
@@ -19,6 +20,9 @@ interface SidebarProps {
   onDownload: () => void;
   onClear: () => void;
   hasXml: boolean;
+  xml: string;
+  onOpenPreview: () => void;
+  onNavigateToSection: (sectionId: "form-header" | "form-notify" | "form-items" | "section-flow" | "section-quick-action" | "section-xml-actions") => void;
 }
 
 export function Sidebar({
@@ -31,6 +35,9 @@ export function Sidebar({
   onDownload,
   onClear,
   hasXml,
+  xml,
+  onOpenPreview,
+  onNavigateToSection,
 }: SidebarProps) {
   return (
     <>
@@ -62,7 +69,8 @@ export function Sidebar({
           "fixed lg:relative inset-y-0 left-0 z-40",
           "w-80 bg-card border-r",
           "flex flex-col h-screen",
-          "lg:translate-x-0"
+          "lg:translate-x-0",
+          "app-sidebar"
         )}
       >
         {/* サイドバーヘッダー（モバイルのみ） */}
@@ -83,19 +91,32 @@ export function Sidebar({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           <FlowSection 
             currentStep={currentStep} 
-            completedSteps={completedSteps} 
+            completedSteps={completedSteps}
+            onNavigate={onNavigateToSection}
           />
           
           <div className="border-t pt-6">
-            <QuickActionSection onPresetSelect={onPresetSelect} />
+            <QuickActionSection 
+              onPresetSelect={onPresetSelect}
+              onNavigate={onNavigateToSection}
+            />
+          </div>
+
+          <div className="border-t pt-6">
+            <InputFormSection
+              onNavigate={onNavigateToSection}
+              onClear={onClear}
+            />
           </div>
           
           <div className="border-t pt-6">
             <ActionSection
               onGenerate={onGenerate}
               onDownload={onDownload}
-              onClear={onClear}
               hasXml={hasXml}
+              xml={xml}
+              onOpenPreview={onOpenPreview}
+              onNavigate={onNavigateToSection}
             />
           </div>
         </div>

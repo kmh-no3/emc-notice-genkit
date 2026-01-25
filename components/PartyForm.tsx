@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FieldWithTooltip } from "./FieldWithTooltip";
 import { ProgressBadge } from "./ProgressBadge";
 import type { Party } from "@/lib/densai/schema";
@@ -43,10 +42,10 @@ export function PartyForm({
   ].filter((v) => v && v.length > 0).length;
 
   return (
-    <div className="space-y-5 rounded-lg border p-6">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold">{label}</h3>
-        <ProgressBadge current={filledRequired} total={requiredFields} />
+    <div className="space-y-4 sm:space-y-5 rounded-lg border p-4 sm:p-6 w-full max-w-full overflow-hidden">
+      <div className="flex items-center justify-between w-full max-w-full min-w-0">
+        <h3 className="text-lg sm:text-xl font-bold tracking-tight truncate min-w-0 flex-1">{label}</h3>
+        <ProgressBadge current={filledRequired} total={requiredFields} className="shrink-0" />
       </div>
 
       {showRiyosyaNo && (
@@ -78,7 +77,7 @@ export function PartyForm({
         />
       </FieldWithTooltip>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-full">
         <FieldWithTooltip
           label="銀行コード"
           tooltip="4桁の銀行コード（例: 0001=みずほ銀行）"
@@ -105,7 +104,7 @@ export function PartyForm({
         </FieldWithTooltip>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-full">
         <FieldWithTooltip
           label="支店コード"
           tooltip="3桁の支店コード"
@@ -132,7 +131,7 @@ export function PartyForm({
         </FieldWithTooltip>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-full">
         <FieldWithTooltip
           label="口座種別"
           tooltip="1:普通預金、2:当座預金、9:その他"

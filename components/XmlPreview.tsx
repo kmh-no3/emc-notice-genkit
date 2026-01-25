@@ -24,20 +24,20 @@ export function XmlPreview({ xml, onDownload }: XmlPreviewProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>XMLプレビュー</CardTitle>
+    <Card className="w-full max-w-full">
+      <CardHeader className="w-full max-w-full overflow-hidden">
+        <CardTitle className="truncate">XMLプレビュー</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 w-full max-w-full overflow-hidden">
         <Textarea
           value={xml}
           readOnly
-          className="font-mono text-xs"
+          className="font-mono text-xs w-full max-w-full overflow-x-auto"
           rows={20}
         />
-        <div className="flex gap-2">
-          <Button onClick={onDownload}>XMLをダウンロード</Button>
-          <Button variant="outline" onClick={handleCopy}>
+        <div className="flex flex-wrap gap-2 w-full max-w-full">
+          <Button onClick={onDownload} className="flex-1 sm:flex-initial min-w-0">XMLをダウンロード</Button>
+          <Button variant="outline" onClick={handleCopy} className="flex-1 sm:flex-initial min-w-0">
             {copied ? "コピーしました" : "クリップボードにコピー"}
           </Button>
         </div>

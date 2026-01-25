@@ -86,15 +86,15 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold">明細データ</h2>
+    <div className="space-y-4 sm:space-y-5 w-full max-w-full overflow-hidden">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full max-w-full">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <h3 className="text-lg sm:text-xl font-bold tracking-tight truncate">③明細情報</h3>
           {items.length > 0 && (
-            <Badge variant="secondary">{items.length}件</Badge>
+            <Badge variant="secondary" className="shrink-0">{items.length}件</Badge>
           )}
         </div>
-        <Button onClick={handleAddItem}>明細を追加</Button>
+        <Button onClick={handleAddItem} className="w-full sm:w-auto shrink-0">明細を追加</Button>
       </div>
 
       {items.length === 0 ? (
@@ -103,7 +103,7 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
           onLoadSample={onLoadSample || (() => {})}
         />
       ) : (
-        <Accordion type="single" collapsible className="w-full">
+        <Accordion type="single" collapsible className="w-full max-w-full">
         {items.map((item, index) => (
           <AccordionItem key={index} value={`item-${index}`}>
             <AccordionTrigger>
@@ -111,12 +111,13 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
               {item.kiroku_no && ` - ${item.kiroku_no}`}
             </AccordionTrigger>
             <AccordionContent>
-              <div className="space-y-5 p-4">
-                <div className="flex justify-end">
+              <div className="space-y-4 sm:space-y-5 p-3 sm:p-4 w-full max-w-full overflow-hidden">
+                <div className="flex justify-end w-full max-w-full">
                   <Button
                     variant="destructive"
                     size="sm"
                     onClick={() => handleRemoveItem(index)}
+                    className="w-full sm:w-auto"
                   >
                     この明細を削除
                   </Button>
@@ -160,7 +161,7 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
                   onChange={(v) => handleItemChange(index, "entitled_inf", v)}
                 />
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-full">
                   <div className="space-y-2">
                     <Label>
                       債権金額 <span className="text-red-500">*</span>
@@ -193,7 +194,7 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-full">
                   <div className="space-y-2">
                     <Label>
                       記録番号 <span className="text-red-500">*</span>
@@ -224,11 +225,11 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-4 space-y-5">
+                <div className="rounded-lg border p-3 sm:p-4 space-y-4 sm:space-y-5 w-full max-w-full overflow-hidden">
                   <h4 className="font-semibold text-sm">
                     伝票特定補助フィールド（任意）
                   </h4>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-full">
                     <div className="space-y-2">
                       <Label>会社コード (BUKRS)</Label>
                       <Input
@@ -263,20 +264,16 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>依頼人Ref.No.</Label>
-                    <Input
-                      value={item.irainin_ref_no || ""}
-                      onChange={(e) =>
-                        handleItemChange(index, "irainin_ref_no", e.target.value)
-                      }
-                      placeholder="自動生成または手入力"
-                      maxLength={40}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      BUKRS/BELNR/GJAHRを入力すると自動生成されます（最大40文字）
-                    </p>
-                  </div>
+                  {item.irainin_ref_no && (
+                    <div className="space-y-2">
+                      <Label>依頼人Ref.No. (自動生成)</Label>
+                      <Input
+                        value={item.irainin_ref_no}
+                        disabled
+                        className="bg-muted"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </AccordionContent>
