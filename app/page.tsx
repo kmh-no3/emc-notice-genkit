@@ -171,13 +171,13 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* 固定ヘッダー */}
-      <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-sm">
+      <header className="sticky top-0 z-50 w-full bg-background border-b border-border">
         <div className="container mx-auto px-4 py-4 sm:px-6 sm:py-5 lg:px-8 responsive-container">
           <FadeIn>
             <div className="flex items-start justify-between gap-4 w-full max-w-full">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className="space-y-1 min-w-0 flex-1">
-                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">
+                  <h1 className="text-xl sm:text-2xl font-semibold tracking-tight truncate">
                     でんさい通知XML テストデータ生成ツール
                   </h1>
                   <p className="text-sm text-muted-foreground hidden sm:block truncate">
@@ -196,7 +196,8 @@ export default function Home() {
 
       {/* メインコンテンツ */}
       <main className="overflow-y-auto overflow-x-hidden bg-background w-full max-w-full">
-        <div className="container mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8 responsive-container">
+        <div className="container mx-auto px-4 pt-8 pb-16 sm:px-6 sm:pt-12 sm:pb-24 lg:px-8">
+          <div className="zenn-content">
 
           {/* ウェルカムカード（初回訪問時のみ） */}
           {isFirstVisit && (
@@ -210,14 +211,25 @@ export default function Home() {
 
           {/* コンテンツ */}
           <FadeIn>
-            <div className="space-y-6 w-full max-w-full overflow-hidden">
+            <div className="space-y-14 w-full max-w-full overflow-hidden">
+              {/* ツール説明 */}
+              <section className="w-full max-w-full pb-2">
+                <div className="space-y-3 text-base text-muted-foreground leading-relaxed">
+                  <p>
+                    このツールは、SAP S/4HANA 日本EMC関連のテストデータとして使用する「でんさい通知XML」を簡単に生成できます。
+                  </p>
+                  <p>
+                    下記の手順に従って、必要な情報を入力し、XMLファイルを生成・ダウンロードしてください。
+                  </p>
+                </div>
+              </section>
+
               {/* フローセクション */}
-              <Card id="section-flow" className="scroll-mt-24 w-full max-w-full">
-                <CardContent className="pt-4 sm:pt-6 w-full max-w-full overflow-hidden">
-                  <div className="space-y-3">
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight flex items-center gap-2">
-                      <span className="text-lg sm:text-xl lg:text-2xl">■</span>フロー
-                    </h2>
+              <section id="section-flow" className="scroll-mt-24 w-full max-w-full pb-10 border-b border-border">
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold tracking-tight mb-4">
+                    利用手順
+                  </h2>
                     <ol className="space-y-2 text-sm">
                       {[
                         { id: 1, label: "データ入力" },
@@ -236,28 +248,23 @@ export default function Home() {
                               ${!isCompleted && !isCurrent ? "text-muted-foreground" : ""}
                             `}
                           >
-                            {step.id}. {step.label}
+                            {step.label}
                           </li>
                         );
                       })}
                     </ol>
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+              </section>
 
-              {/* クイックアクションセクション */}
-              <Card id="section-quick-action" className="scroll-mt-24 w-full max-w-full">
-                <CardContent className="pt-4 sm:pt-6 w-full max-w-full overflow-hidden">
-                  <div className="space-y-3">
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight flex items-center gap-2">
-                      <span className="text-lg sm:text-xl lg:text-2xl">■</span>クイックアクション
-                    </h2>
-                    <div className="space-y-2">
-                      <PresetSelector onSelect={handlePresetSelect} />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* サンプルセクション */}
+              <section id="section-quick-action" className="scroll-mt-24 w-full max-w-full pb-10 border-b border-border">
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold tracking-tight mb-4">
+                    サンプル
+                  </h2>
+                  <PresetSelector onSelect={handlePresetSelect} />
+                </div>
+              </section>
 
               {/* 入力フォームセクション */}
               <HeaderForm
@@ -265,73 +272,37 @@ export default function Home() {
                 onChange={(header) => setInput({ ...input, header })}
               />
 
-                <Card id="form-items" className="w-full max-w-full">
-                  <CardContent className="pt-4 sm:pt-6 w-full max-w-full overflow-hidden">
-                    <DataItemForm
-                      items={input.data}
-                      onChange={(data) => setInput({ ...input, data })}
-                      onLoadSample={handleLoadSampleFromWelcome}
-                    />
-                  </CardContent>
-                </Card>
+                <section id="form-items" className="w-full max-w-full pb-4">
+                  <DataItemForm
+                    items={input.data}
+                    onChange={(data) => setInput({ ...input, data })}
+                    onLoadSample={handleLoadSampleFromWelcome}
+                  />
+                </section>
 
               {/* XML生成・ダウンロードセクション */}
-              <Card id="section-xml-actions" className="scroll-mt-24 w-full max-w-full">
-                <CardContent className="pt-4 sm:pt-6 w-full max-w-full overflow-hidden">
+              <section id="section-xml-actions" className="scroll-mt-24 w-full max-w-full pb-6">
+                <div className="space-y-4">
+                  <h2 className="text-2xl font-semibold tracking-tight mb-4">
+                    XML生成・ダウンロード
+                  </h2>
                   <div className="space-y-3">
-                    <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight flex items-center gap-2">
-                      <span className="text-lg sm:text-xl lg:text-2xl">■</span>XML生成・ダウンロード
-                    </h2>
-                    <div className="space-y-2">
-                      <Button onClick={handleGenerate} className="w-full h-10 sm:h-12 text-sm sm:text-base px-4 sm:px-8">
-                        XML生成
-                      </Button>
-                      <Button
-                        onClick={handleDownload}
-                        variant="outline"
-                        className="w-full h-10 sm:h-12 text-sm sm:text-base px-4 sm:px-8"
-                        disabled={!xml}
-                      >
-                        XMLダウンロード
-                      </Button>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">XMLプレビュー</p>
-                      </div>
-                      <div className="w-full max-w-full rounded-lg border bg-background/50 p-3 overflow-hidden">
-                        {xml ? (
-                          <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words text-xs leading-relaxed text-muted-foreground w-full max-w-full">
-                            {xml.slice(0, 600)}
-                            {xml.length > 600 ? "\n…（省略）" : ""}
-                          </pre>
-                        ) : (
-                          <div className="text-xs text-muted-foreground">
-                            未生成です。上の「XML生成」をクリックしてください。
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    <Button onClick={handleGenerate} className="w-full h-10 sm:h-12 text-sm sm:text-base px-4 sm:px-8">
+                      XML生成
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </section>
 
               {/* XMLプレビューセクション */}
               {xml && (
-                <Card id="section-xml-preview" className="scroll-mt-24 w-full max-w-full">
-                  <CardContent className="pt-4 sm:pt-6 w-full max-w-full overflow-hidden">
-                    <div className="space-y-3">
-                      <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight flex items-center gap-2">
-                        <span className="text-lg sm:text-xl lg:text-2xl">■</span>XMLプレビュー
-                      </h2>
-                      <XmlPreview xml={xml} onDownload={handleDownload} />
-                    </div>
-                  </CardContent>
-                </Card>
+                <section id="section-xml-preview" className="scroll-mt-24 w-full max-w-full pb-6">
+                  <XmlPreview xml={xml} onDownload={handleDownload} />
+                </section>
               )}
             </div>
           </FadeIn>
+          </div>
         </div>
       </main>
     </div>

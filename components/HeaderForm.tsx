@@ -17,18 +17,23 @@ export function HeaderForm({ value, onChange }: HeaderFormProps) {
   };
 
   return (
-    <div className="space-y-6 w-full max-w-full overflow-hidden">
+    <div className="space-y-10 w-full max-w-full overflow-hidden">
+      <div className="border-t border-border pt-10 pb-4">
+        <h2 className="text-2xl font-semibold tracking-tight mb-4">
+          データ入力
+        </h2>
+      </div>
       {/* ①ヘッダ情報 */}
-      <Card id="form-header" className="scroll-mt-24 w-full max-w-full">
-        <CardHeader>
-          <h3 className="text-lg sm:text-xl font-bold tracking-tight">
-            ①ヘッダ情報
-          </h3>
-          <CardDescription>
-            通知日を入力してください
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 sm:space-y-6">
+      <section id="form-header" className="scroll-mt-24 w-full max-w-full pb-4">
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-2xl font-semibold tracking-tight mb-2">
+              ①ヘッダ情報
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              通知日を入力してください
+            </p>
+          </div>
           <FieldWithTooltip
             label="通知日"
             tooltip="XMLの通知日を8桁のYYYYMMDD形式で入力（例: 20260125）"
@@ -42,18 +47,18 @@ export function HeaderForm({ value, onChange }: HeaderFormProps) {
               maxLength={8}
             />
           </FieldWithTooltip>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
       {/* ②通知先情報 */}
-      <div id="form-notify" className="scroll-mt-24 w-full max-w-full overflow-hidden">
+      <section id="form-notify" className="scroll-mt-24 w-full max-w-full overflow-hidden pb-4">
         <PartyForm
           label="②通知先情報"
           value={value.notify_inf}
           onChange={(v) => handleChange("notify_inf", v)}
           showRiyosyaNo
         />
-      </div>
+      </section>
     </div>
   );
 }

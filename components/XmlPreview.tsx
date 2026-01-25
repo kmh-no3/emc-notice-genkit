@@ -25,10 +25,7 @@ export function XmlPreview({ xml, onDownload }: XmlPreviewProps) {
 
   return (
     <Card className="w-full max-w-full">
-      <CardHeader className="w-full max-w-full overflow-hidden">
-        <CardTitle className="truncate">XMLプレビュー</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 w-full max-w-full overflow-hidden">
+      <CardContent className="space-y-4 w-full max-w-full overflow-hidden pt-6">
         <Textarea
           value={xml}
           readOnly

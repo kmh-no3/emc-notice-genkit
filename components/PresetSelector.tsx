@@ -52,11 +52,11 @@ export function PresetSelector({ onSelect, compact = false }: PresetSelectorProp
     <div className="space-y-3">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-full">
         <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2 }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+          transition={{ duration: 0.15 }}
         >
-          <Card className="cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20 w-full max-w-full">
+          <Card className="cursor-pointer hover:border-primary/50 transition-all duration-200 w-full max-w-full">
             <CardContent className="p-5 w-full max-w-full overflow-hidden" onClick={() => onSelect(PRESETS.single)}>
             <div className="flex items-start gap-3 w-full max-w-full min-w-0">
               <FileText className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />
@@ -71,11 +71,11 @@ export function PresetSelector({ onSelect, compact = false }: PresetSelectorProp
           </Card>
         </motion.div>
         <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ duration: 0.2 }}
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.99 }}
+          transition={{ duration: 0.15 }}
         >
-          <Card className="cursor-pointer hover:border-primary/50 transition-all duration-300 hover:shadow-2xl hover:shadow-primary/20 w-full max-w-full">
+          <Card className="cursor-pointer hover:border-primary/50 transition-all duration-200 w-full max-w-full">
             <CardContent className="p-5 w-full max-w-full overflow-hidden" onClick={() => onSelect(PRESETS.multiple)}>
             <div className="flex items-start gap-3 w-full max-w-full min-w-0">
               <Files className="h-5 w-5 text-muted-foreground mt-0.5 shrink-0" />

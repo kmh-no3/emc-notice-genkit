@@ -1,9 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
@@ -17,30 +14,52 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" className="w-10 h-10">
-        <Sun className="h-5 w-5" />
-      </Button>
+      <button
+        aria-label="テーマを切り替える"
+        className="inline-flex items-center justify-center w-10 h-10 transition-opacity hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <svg
+          width="23"
+          height="23"
+          fill="currentColor"
+          viewBox="0 -960 960 960"
+          className="text-foreground"
+        >
+          <path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z" />
+        </svg>
+      </button>
     );
   }
 
   return (
-    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="w-10 h-10 relative overflow-hidden transition-all duration-300 hover:bg-primary/10"
-      >
-        <motion.div
-          initial={false}
-          animate={{ rotate: theme === "dark" ? 180 : 0 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+    <button
+      aria-label="テーマを切り替える"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="inline-flex items-center justify-center w-10 h-10 transition-colors hover:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      {theme === "dark" ? (
+        // ダークモード時：太陽アイコン
+        <svg
+          width="23"
+          height="23"
+          fill="currentColor"
+          viewBox="0 -960 960 960"
+          className="text-foreground"
         >
-          <Sun className="h-5 w-5 absolute inset-0 m-auto rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="h-5 w-5 absolute inset-0 m-auto rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-        </motion.div>
-        <span className="sr-only">テーマ切り替え</span>
-      </Button>
-    </motion.div>
+          <path d="M480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480q0 83-58.5 141.5T480-280ZM200-440H40v-80h160v80Zm720 0H760v-80h160v80ZM480-760v-160h80v160h-80Zm0 720v-160h80v160h-80ZM256-650l-101-97 57-59 96 100-52 56Zm492 496-97-101 53-55 101 97-57 59Zm-98-550 97-101 59 57-100 96-56-52ZM154-212l101-97 55 53-97 101-59-57Z" />
+        </svg>
+      ) : (
+        // ライトモード時：月アイコン（Zennと同じ）
+        <svg
+          width="23"
+          height="23"
+          fill="currentColor"
+          viewBox="0 -960 960 960"
+          className="text-foreground"
+        >
+          <path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z" />
+        </svg>
+      )}
+    </button>
   );
 }

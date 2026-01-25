@@ -33,7 +33,7 @@ export function FieldWithTooltip({
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors p-0 border-0 bg-transparent shadow-none hover:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
               >
                 <HelpCircle className="h-4 w-4" />
                 <span className="sr-only">ヘルプ</span>

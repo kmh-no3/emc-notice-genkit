@@ -87,12 +87,9 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
 
   return (
     <div className="space-y-4 sm:space-y-5 w-full max-w-full overflow-hidden">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full max-w-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 w-full max-w-full mb-4">
         <div className="flex items-center gap-3 min-w-0 flex-1">
-          <h3 className="text-lg sm:text-xl font-bold tracking-tight truncate">③明細情報</h3>
-          {items.length > 0 && (
-            <Badge variant="secondary" className="shrink-0">{items.length}件</Badge>
-          )}
+          <h3 className="text-2xl font-semibold tracking-tight truncate">③明細情報</h3>
         </div>
         <Button onClick={handleAddItem} className="w-full sm:w-auto shrink-0">明細を追加</Button>
       </div>
