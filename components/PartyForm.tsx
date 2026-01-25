@@ -9,6 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { FieldWithTooltip } from "./FieldWithTooltip";
+import { ProgressBadge } from "./ProgressBadge";
 import type { Party } from "@/lib/densai/schema";
 
 interface PartyFormProps {
@@ -28,15 +31,30 @@ export function PartyForm({
     onChange({ ...value, [field]: newValue });
   };
 
+  // 必須項目の入力チェック
+  const requiredFields = showRiyosyaNo ? 6 : 5;
+  const filledRequired = [
+    showRiyosyaNo ? value.riyosya_no : null,
+    value.riyosya_name,
+    value.bank_cd,
+    value.shiten_cd,
+    value.koza_sbt_cd,
+    value.koza_no,
+  ].filter((v) => v && v.length > 0).length;
+
   return (
     <div className="space-y-4 rounded-lg border p-4">
-      <h3 className="font-semibold">{label}</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold">{label}</h3>
+        <ProgressBadge current={filledRequired} total={requiredFields} />
+      </div>
 
       {showRiyosyaNo && (
-        <div className="space-y-2">
-          <Label htmlFor={`${label}-riyosya-no`}>
-            利用者番号 <span className="text-red-500">*</span>
-          </Label>
+        <FieldWithTooltip
+          label="利用者番号"
+          tooltip="でんさいネットの利用者番号（最大9桁の数字）"
+          required
+        >
           <Input
             id={`${label}-riyosya-no`}
             value={value.riyosya_no || ""}
@@ -44,26 +62,28 @@ export function PartyForm({
             placeholder="123456789"
             maxLength={9}
           />
-        </div>
+        </FieldWithTooltip>
       )}
 
-      <div className="space-y-2">
-        <Label htmlFor={`${label}-riyosya-name`}>
-          利用者名 <span className="text-red-500">*</span>
-        </Label>
+      <FieldWithTooltip
+        label="利用者名"
+        tooltip="義務者または権利者の利用者名（半角英数推奨）"
+        required
+      >
         <Input
           id={`${label}-riyosya-name`}
           value={value.riyosya_name}
           onChange={(e) => handleChange("riyosya_name", e.target.value)}
           placeholder="TEST_PARTY"
         />
-      </div>
+      </FieldWithTooltip>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor={`${label}-bank-cd`}>
-            銀行コード <span className="text-red-500">*</span>
-          </Label>
+        <FieldWithTooltip
+          label="銀行コード"
+          tooltip="4桁の銀行コード（例: 0001=みずほ銀行）"
+          required
+        >
           <Input
             id={`${label}-bank-cd`}
             value={value.bank_cd}
@@ -71,23 +91,26 @@ export function PartyForm({
             placeholder="0001"
             maxLength={4}
           />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor={`${label}-bank-name`}>銀行名</Label>
+        </FieldWithTooltip>
+        <FieldWithTooltip
+          label="銀行名"
+          tooltip="銀行名（任意、記録用）"
+        >
           <Input
             id={`${label}-bank-name`}
             value={value.bank_name || ""}
             onChange={(e) => handleChange("bank_name", e.target.value)}
             placeholder="みずほ銀行"
           />
-        </div>
+        </FieldWithTooltip>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor={`${label}-shiten-cd`}>
-            支店コード <span className="text-red-500">*</span>
-          </Label>
+        <FieldWithTooltip
+          label="支店コード"
+          tooltip="3桁の支店コード"
+          required
+        >
           <Input
             id={`${label}-shiten-cd`}
             value={value.shiten_cd}
@@ -95,23 +118,26 @@ export function PartyForm({
             placeholder="001"
             maxLength={3}
           />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor={`${label}-shiten-name`}>支店名</Label>
+        </FieldWithTooltip>
+        <FieldWithTooltip
+          label="支店名"
+          tooltip="支店名（任意、記録用）"
+        >
           <Input
             id={`${label}-shiten-name`}
             value={value.shiten_name || ""}
             onChange={(e) => handleChange("shiten_name", e.target.value)}
             placeholder="東京営業部"
           />
-        </div>
+        </FieldWithTooltip>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor={`${label}-koza-sbt`}>
-            口座種別 <span className="text-red-500">*</span>
-          </Label>
+        <FieldWithTooltip
+          label="口座種別"
+          tooltip="1:普通預金、2:当座預金、9:その他"
+          required
+        >
           <Select
             value={value.koza_sbt_cd}
             onValueChange={(v) => handleChange("koza_sbt_cd", v)}
@@ -125,11 +151,12 @@ export function PartyForm({
               <SelectItem value="9">9:その他</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor={`${label}-koza-no`}>
-            口座番号 <span className="text-red-500">*</span>
-          </Label>
+        </FieldWithTooltip>
+        <FieldWithTooltip
+          label="口座番号"
+          tooltip="1〜7桁の数字を入力。自動で7桁に左0埋めされます"
+          required
+        >
           <Input
             id={`${label}-koza-no`}
             value={value.koza_no}
@@ -137,10 +164,7 @@ export function PartyForm({
             placeholder="1234567"
             maxLength={7}
           />
-          <p className="text-xs text-muted-foreground">
-            1〜7桁の数字（自動で7桁に左0埋めされます）
-          </p>
-        </div>
+        </FieldWithTooltip>
       </div>
     </div>
   );

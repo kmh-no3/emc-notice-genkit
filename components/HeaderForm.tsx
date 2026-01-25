@@ -1,9 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PartyForm } from "./PartyForm";
+import { FieldWithTooltip } from "./FieldWithTooltip";
 import type { Header } from "@/lib/densai/schema";
 
 interface HeaderFormProps {
@@ -20,12 +21,16 @@ export function HeaderForm({ value, onChange }: HeaderFormProps) {
     <Card>
       <CardHeader>
         <CardTitle>ヘッダ情報</CardTitle>
+        <CardDescription>
+          通知日と通知先の情報を入力してください
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="notice-date">
-            通知日 <span className="text-red-500">*</span>
-          </Label>
+        <FieldWithTooltip
+          label="通知日"
+          tooltip="XMLの通知日を8桁のYYYYMMDD形式で入力（例: 20260125）"
+          required
+        >
           <Input
             id="notice-date"
             value={value.notice_date}
@@ -33,8 +38,7 @@ export function HeaderForm({ value, onChange }: HeaderFormProps) {
             placeholder="20260125"
             maxLength={8}
           />
-          <p className="text-xs text-muted-foreground">YYYYMMDD形式</p>
-        </div>
+        </FieldWithTooltip>
 
         <PartyForm
           label="通知先情報"

@@ -16,16 +16,20 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { PartyForm } from "./PartyForm";
+import { EmptyState } from "./EmptyState";
+import { FieldWithTooltip } from "./FieldWithTooltip";
 import type { NoticeItem } from "@/lib/densai/schema";
 import { generateIraininRefNo } from "@/lib/densai/format";
 
 interface DataItemFormProps {
   items: NoticeItem[];
   onChange: (items: NoticeItem[]) => void;
+  onLoadSample?: () => void;
 }
 
-export function DataItemForm({ items, onChange }: DataItemFormProps) {
+export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProps) {
   const handleAddItem = () => {
     const newItem: NoticeItem = {
       notice_cd: "01",
@@ -84,17 +88,22 @@ export function DataItemForm({ items, onChange }: DataItemFormProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">明細データ</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-semibold">明細データ</h2>
+          {items.length > 0 && (
+            <Badge variant="secondary">{items.length}件</Badge>
+          )}
+        </div>
         <Button onClick={handleAddItem}>明細を追加</Button>
       </div>
 
-      {items.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          明細がありません。「明細を追加」ボタンをクリックしてください。
-        </p>
-      )}
-
-      <Accordion type="single" collapsible className="w-full">
+      {items.length === 0 ? (
+        <EmptyState
+          onAddItem={handleAddItem}
+          onLoadSample={onLoadSample || (() => {})}
+        />
+      ) : (
+        <Accordion type="single" collapsible className="w-full">
         {items.map((item, index) => (
           <AccordionItem key={index} value={`item-${index}`}>
             <AccordionTrigger>
@@ -273,7 +282,8 @@ export function DataItemForm({ items, onChange }: DataItemFormProps) {
             </AccordionContent>
           </AccordionItem>
         ))}
-      </Accordion>
+        </Accordion>
+      )}
     </div>
   );
 }

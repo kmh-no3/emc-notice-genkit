@@ -8,6 +8,8 @@ import { HeaderForm } from "@/components/HeaderForm";
 import { DataItemForm } from "@/components/DataItemForm";
 import { XmlPreview } from "@/components/XmlPreview";
 import { PresetSelector } from "@/components/PresetSelector";
+import { WelcomeCard } from "@/components/WelcomeCard";
+import { StepIndicator } from "@/components/StepIndicator";
 import type { NoticeInput } from "@/lib/densai/schema";
 import { generateNoticeXml } from "@/lib/densai/generate";
 import { getCurrentDate } from "@/lib/densai/format";
@@ -16,6 +18,10 @@ import {
   loadFromLocalStorage,
   clearLocalStorage,
 } from "@/lib/storage";
+import { useOnboarding } from "@/hooks/useOnboarding";
+import { useStepProgress, type Step } from "@/hooks/useStepProgress";
+import { toast } from "sonner";
+import { PRESETS } from "@/lib/densai/presets";
 
 export default function Home() {
   const [input, setInput] = useState<NoticeInput>({
@@ -37,6 +43,18 @@ export default function Home() {
   const [xml, setXml] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
+  const [activeTab, setActiveTab] = useState<"form" | "preview">("form");
+
+  // Hooks
+  const { isFirstVisit, isLoading, completeOnboarding } = useOnboarding();
+  const {
+    currentStep,
+    steps,
+    completedSteps,
+    nextStep,
+    completeStep,
+    goToStep,
+  } = useStepProgress();
 
   // ローカルストレージから復元
   useEffect(() => {
@@ -63,11 +81,21 @@ export default function Home() {
     if (result.success && result.xml) {
       setXml(result.xml);
       setError("");
+      completeStep(1);
+      completeStep(2);
+      goToStep(3);
+      setActiveTab("preview");
+      toast.success("XMLの生成に成功しました", {
+        description: "プレビュータブでXMLを確認できます",
+      });
     } else {
       setError(result.error || "XML生成に失敗しました");
       setXml("");
+      toast.error("XML生成に失敗しました", {
+        description: result.error,
+      });
     }
-  }, [input]);
+  }, [input, completeStep, goToStep]);
 
   // XMLダウンロード
   const handleDownload = useCallback(() => {
@@ -82,14 +110,24 @@ export default function Home() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  }, [xml]);
+    
+    completeStep(3);
+    toast.success("XMLファイルのダウンロードが完了しました", {
+      description: "notice_ACR.ASG.DIV.xml",
+    });
+  }, [xml, completeStep]);
 
   // プリセット読み込み
   const handlePresetSelect = useCallback((preset: NoticeInput) => {
     setInput(preset);
     setXml("");
     setError("");
-  }, []);
+    goToStep(1);
+    setActiveTab("form");
+    toast.success("サンプルデータを読み込みました", {
+      description: "フォームを確認して、必要に応じて編集してください",
+    });
+  }, [goToStep]);
 
   // データクリア
   const handleClear = useCallback(() => {
@@ -112,8 +150,31 @@ export default function Home() {
       });
       setXml("");
       setError("");
+      goToStep(1);
+      setActiveTab("form");
+      toast.info("データをクリアしました");
     }
-  }, []);
+  }, [goToStep]);
+
+  // ウェルカムカードのサンプルデータ読み込み
+  const handleLoadSampleFromWelcome = useCallback(() => {
+    setInput(PRESETS.single);
+    setXml("");
+    setError("");
+    completeOnboarding();
+    goToStep(1);
+    toast.success("サンプルデータを読み込みました");
+  }, [completeOnboarding, goToStep]);
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="flex items-center justify-center min-h-screen">
+          <p className="text-muted-foreground">読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -127,6 +188,21 @@ export default function Home() {
             SAP S/4HANA 日本EMC関連のテストデータを作成します
           </p>
         </div>
+
+        {/* ウェルカムカード（初回訪問時のみ） */}
+        {isFirstVisit && (
+          <WelcomeCard
+            onLoadSample={handleLoadSampleFromWelcome}
+            onDismiss={completeOnboarding}
+          />
+        )}
+
+        {/* ステップインジケーター */}
+        <StepIndicator
+          steps={steps}
+          currentStep={currentStep}
+          completedSteps={completedSteps}
+        />
 
         {/* プリセット選択とアクション */}
         <Card>
@@ -150,7 +226,7 @@ export default function Home() {
         </Card>
 
         {/* メインコンテンツ */}
-        <Tabs defaultValue="form" className="w-full">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "form" | "preview")} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="form">入力フォーム</TabsTrigger>
             <TabsTrigger value="preview">XMLプレビュー</TabsTrigger>
@@ -167,6 +243,7 @@ export default function Home() {
                 <DataItemForm
                   items={input.data}
                   onChange={(data) => setInput({ ...input, data })}
+                  onLoadSample={handleLoadSampleFromWelcome}
                 />
               </CardContent>
             </Card>
