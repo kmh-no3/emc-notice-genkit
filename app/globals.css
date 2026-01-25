@@ -298,4 +298,19 @@
       max-width: 1200px;
     }
   }
+
+  /* サイドバーのレスポンシブ対応 */
+  @media (min-width: 1024px) {
+    /* デスクトップ: サイドバーは常に表示、アニメーション無効 */
+    aside {
+      transform: translateX(0) !important;
+    }
+  }
+  
+  @media (max-width: 1023px) {
+    /* モバイル/タブレット: サイドバーはオーバーレイ */
+    aside {
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+  }
 }

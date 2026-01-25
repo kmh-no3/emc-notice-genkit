@@ -9,9 +9,45 @@ import type { NoticeInput } from "@/lib/densai/schema";
 
 interface PresetSelectorProps {
   onSelect: (preset: NoticeInput) => void;
+  compact?: boolean;
 }
 
-export function PresetSelector({ onSelect }: PresetSelectorProps) {
+export function PresetSelector({ onSelect, compact = false }: PresetSelectorProps) {
+  // コンパクト版（サイドバー用）
+  if (compact) {
+    return (
+      <div className="space-y-2">
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3"
+          onClick={() => onSelect(PRESETS.single)}
+        >
+          <FileText className="mr-2 h-4 w-4 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium">①{PRESET_LABELS.single}</div>
+            <div className="text-xs text-muted-foreground truncate">
+              最小限の入力項目で動作を確認
+            </div>
+          </div>
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full justify-start text-left h-auto py-3"
+          onClick={() => onSelect(PRESETS.multiple)}
+        >
+          <Files className="mr-2 h-4 w-4 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium">②{PRESET_LABELS.multiple}</div>
+            <div className="text-xs text-muted-foreground truncate">
+              複数明細と合計値の計算を確認
+            </div>
+          </div>
+        </Button>
+      </div>
+    );
+  }
+
+  // 通常版（メインページ用）
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">

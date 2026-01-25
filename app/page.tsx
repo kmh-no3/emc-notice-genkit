@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Menu } from "lucide-react";
 import { HeaderForm } from "@/components/HeaderForm";
 import { DataItemForm } from "@/components/DataItemForm";
 import { XmlPreview } from "@/components/XmlPreview";
-import { PresetSelector } from "@/components/PresetSelector";
 import { WelcomeCard } from "@/components/WelcomeCard";
-import { StepIndicator } from "@/components/StepIndicator";
+import { Sidebar } from "@/components/Sidebar";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { FadeIn } from "@/components/animations/FadeIn";
 import type { NoticeInput } from "@/lib/densai/schema";
@@ -21,7 +20,7 @@ import {
   clearLocalStorage,
 } from "@/lib/storage";
 import { useOnboarding } from "@/hooks/useOnboarding";
-import { useStepProgress, type Step } from "@/hooks/useStepProgress";
+import { useStepProgress } from "@/hooks/useStepProgress";
 import { toast } from "sonner";
 import { PRESETS } from "@/lib/densai/presets";
 
@@ -45,15 +44,14 @@ export default function Home() {
   const [xml, setXml] = useState<string>("");
   const [error, setError] = useState<string>("");
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
-  const [activeTab, setActiveTab] = useState<"form" | "preview">("form");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"form" | "preview">("form");
 
   // Hooks
   const { isFirstVisit, isLoading, completeOnboarding } = useOnboarding();
   const {
     currentStep,
-    steps,
     completedSteps,
-    nextStep,
     completeStep,
     goToStep,
   } = useStepProgress();
@@ -86,9 +84,9 @@ export default function Home() {
       completeStep(1);
       completeStep(2);
       goToStep(3);
-      setActiveTab("preview");
+      setViewMode("preview");
       toast.success("XMLの生成に成功しました", {
-        description: "プレビュータブでXMLを確認できます",
+        description: "XMLプレビューに切り替えました",
       });
     } else {
       setError(result.error || "XML生成に失敗しました");
@@ -125,7 +123,8 @@ export default function Home() {
     setXml("");
     setError("");
     goToStep(1);
-    setActiveTab("form");
+    setViewMode("form");
+    setSidebarOpen(false);
     toast.success("サンプルデータを読み込みました", {
       description: "フォームを確認して、必要に応じて編集してください",
     });
@@ -153,7 +152,8 @@ export default function Home() {
       setXml("");
       setError("");
       goToStep(1);
-      setActiveTab("form");
+      setViewMode("form");
+      setSidebarOpen(false);
       toast.info("データをクリアしました");
     }
   }, [goToStep]);
@@ -170,129 +170,147 @@ export default function Home() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-muted-foreground">読み込み中...</p>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-muted-foreground">読み込み中...</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 max-w-6xl">
-      <div className="space-y-12">
-        {/* ヘッダ */}
-        <FadeIn>
-          <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
-          <div className="space-y-3 flex-1">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-              でんさい通知XML テストデータ生成ツール
-            </h1>
-            <p className="text-sm sm:text-base lg:text-lg text-muted-foreground leading-relaxed">
-              SAP S/4HANA 日本EMC関連のテストデータを作成します
-            </p>
-          </div>
-          <div className="self-start sm:self-auto">
-            <ThemeToggle />
-          </div>
-          </div>
-        </FadeIn>
+    <div className="flex h-screen overflow-hidden">
+      {/* サイドバー */}
+      <Sidebar
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        currentStep={currentStep}
+        completedSteps={completedSteps}
+        onPresetSelect={handlePresetSelect}
+        onGenerate={handleGenerate}
+        onDownload={handleDownload}
+        onClear={handleClear}
+        hasXml={!!xml}
+      />
 
-        {/* ウェルカムカード（初回訪問時のみ） */}
-        {isFirstVisit && (
-          <WelcomeCard
-            onLoadSample={handleLoadSampleFromWelcome}
-            onDismiss={completeOnboarding}
-          />
-        )}
-
-        {/* ステップインジケーター */}
-        <FadeIn delay={0.1}>
-          <StepIndicator
-            steps={steps}
-            currentStep={currentStep}
-            completedSteps={completedSteps}
-          />
-        </FadeIn>
-
-        {/* プリセット選択とアクション */}
-        <FadeIn delay={0.2}>
-          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-            <CardHeader>
-              <CardTitle>クイックアクション</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <PresetSelector onSelect={handlePresetSelect} />
-              <div className="flex gap-3">
-                <Button size="lg" onClick={handleGenerate}>XML生成</Button>
-                <Button size="lg" variant="outline" onClick={handleClear}>
-                  データをクリア
+      {/* メインコンテンツ */}
+      <main className="flex-1 overflow-y-auto bg-background">
+        <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+          {/* ヘッダー */}
+          <FadeIn>
+            <div className="flex items-start justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3 flex-1">
+                {/* モバイルメニューボタン */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                  className="lg:hidden shrink-0"
+                >
+                  <Menu className="h-5 w-5" />
+                  <span className="sr-only">メニュー</span>
                 </Button>
-              </div>
-              {error && (
-                <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
-                  <strong>エラー:</strong> {error}
+                
+                <div className="space-y-1 min-w-0">
+                  <h1 className="text-2xl sm:text-3xl font-bold tracking-tight truncate">
+                    でんさい通知XML テストデータ生成ツール
+                  </h1>
+                  <p className="text-sm text-muted-foreground hidden sm:block">
+                    SAP S/4HANA 日本EMC関連のテストデータを作成します
+                  </p>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </FadeIn>
+              </div>
+              
+              <div className="flex items-center gap-2 shrink-0">
+                <Button
+                  variant={viewMode === "form" ? "default" : "outline"}
+                  onClick={() => setViewMode("form")}
+                  size="sm"
+                  className="hidden sm:flex"
+                >
+                  入力フォーム
+                </Button>
+                <Button
+                  variant={viewMode === "preview" ? "default" : "outline"}
+                  onClick={() => setViewMode("preview")}
+                  size="sm"
+                  className="hidden sm:flex"
+                >
+                  XMLプレビュー
+                </Button>
+                <ThemeToggle />
+              </div>
+            </div>
+          </FadeIn>
 
-        {/* メインコンテンツ */}
-        <FadeIn delay={0.3}>
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "form" | "preview")} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="form">入力フォーム</TabsTrigger>
-            <TabsTrigger value="preview">XMLプレビュー</TabsTrigger>
-          </TabsList>
+          {/* モバイル用表示切り替えボタン */}
+          <div className="flex gap-2 mb-6 sm:hidden">
+            <Button
+              variant={viewMode === "form" ? "default" : "outline"}
+              onClick={() => setViewMode("form")}
+              className="flex-1"
+            >
+              入力フォーム
+            </Button>
+            <Button
+              variant={viewMode === "preview" ? "default" : "outline"}
+              onClick={() => setViewMode("preview")}
+              className="flex-1"
+            >
+              XMLプレビュー
+            </Button>
+          </div>
 
-          <TabsContent value="form" className="space-y-6">
-            <HeaderForm
-              value={input.header}
-              onChange={(header) => setInput({ ...input, header })}
-            />
+          {/* ウェルカムカード（初回訪問時のみ） */}
+          {isFirstVisit && (
+            <div className="mb-6">
+              <WelcomeCard
+                onLoadSample={handleLoadSampleFromWelcome}
+                onDismiss={completeOnboarding}
+              />
+            </div>
+          )}
 
-            <Card>
-              <CardContent className="pt-6">
-                <DataItemForm
-                  items={input.data}
-                  onChange={(data) => setInput({ ...input, data })}
-                  onLoadSample={handleLoadSampleFromWelcome}
+          {/* エラー表示 */}
+          {error && (
+            <div className="mb-6 rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
+              <strong>エラー:</strong> {error}
+            </div>
+          )}
+
+          {/* コンテンツ切り替え */}
+          <FadeIn>
+            {viewMode === "form" ? (
+              <div className="space-y-6">
+                <HeaderForm
+                  value={input.header}
+                  onChange={(header) => setInput({ ...input, header })}
                 />
-              </CardContent>
-            </Card>
-          </TabsContent>
 
-          <TabsContent value="preview">
-            {xml ? (
-              <XmlPreview xml={xml} onDownload={handleDownload} />
+                <Card>
+                  <CardContent className="pt-6">
+                    <DataItemForm
+                      items={input.data}
+                      onChange={(data) => setInput({ ...input, data })}
+                      onLoadSample={handleLoadSampleFromWelcome}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
             ) : (
-              <Card>
-                <CardContent className="py-12 text-center text-muted-foreground">
-                  <p>「XML生成」ボタンをクリックしてXMLを生成してください。</p>
-                </CardContent>
-              </Card>
+              <div>
+                {xml ? (
+                  <XmlPreview xml={xml} onDownload={handleDownload} />
+                ) : (
+                  <Card>
+                    <CardContent className="py-12 text-center text-muted-foreground">
+                      <p>「XML生成」ボタンをクリックしてXMLを生成してください。</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             )}
-          </TabsContent>
-        </Tabs>
-        </FadeIn>
-
-        {/* フッター */}
-        <Card>
-          <CardContent className="py-4 text-sm text-muted-foreground">
-            <p>
-              <strong>注意事項:</strong>
-              このツールで生成したXMLは、SAP EMC_JP (RFFOJP_EMC)
-              でテスト投入するためのものです。
-              <br />
-              実際のでんさいネット標準フォーマット XML ver1.3
-              に準拠しています。
-              <br />
-              入力データは自動的にブラウザのローカルストレージに保存されます。
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          </FadeIn>
+        </div>
+      </main>
     </div>
   );
 }
