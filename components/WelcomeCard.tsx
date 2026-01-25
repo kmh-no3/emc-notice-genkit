@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -12,7 +13,13 @@ interface WelcomeCardProps {
 
 export function WelcomeCard({ onLoadSample, onDismiss }: WelcomeCardProps) {
   return (
-    <Card className="border-primary/30 bg-primary/5 dark:bg-primary/10 animate-fade-in backdrop-blur-xl">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className="border-primary/30 bg-primary/5 dark:bg-primary/10 animate-fade-in backdrop-blur-xl">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -64,5 +71,6 @@ export function WelcomeCard({ onLoadSample, onDismiss }: WelcomeCardProps) {
         </div>
       </CardContent>
     </Card>
+    </motion.div>
   );
 }

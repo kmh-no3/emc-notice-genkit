@@ -43,7 +43,7 @@ export function PartyForm({
   ].filter((v) => v && v.length > 0).length;
 
   return (
-    <div className="space-y-4 rounded-lg border p-4">
+    <div className="space-y-5 rounded-lg border p-6">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">{label}</h3>
         <ProgressBadge current={filledRequired} total={requiredFields} />

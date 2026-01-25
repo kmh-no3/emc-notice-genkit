@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,7 @@ export function StepIndicator({
   completedSteps,
 }: StepIndicatorProps) {
   return (
-    <div className="w-full">
+    <div className="w-full mb-12">
       <div className="flex items-center justify-between">
         {steps.map((step, index) => {
           const isCompleted = completedSteps.has(step.id);
@@ -32,9 +33,12 @@ export function StepIndicator({
             <div key={step.id} className="flex items-center flex-1">
               <div className="flex flex-col items-center flex-1">
                 {/* ステップアイコン */}
-                <div
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: index * 0.1, duration: 0.3 }}
                   className={cn(
-                    "flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all",
+                    "flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all",
                     isCompleted &&
                       "border-primary bg-primary text-primary-foreground",
                     isCurrent && !isCompleted && "border-primary bg-background",
@@ -44,14 +48,14 @@ export function StepIndicator({
                   )}
                 >
                   {isCompleted ? (
-                    <Check className="h-5 w-5" />
+                    <Check className="h-6 w-6" />
                   ) : (
-                    <span className="text-sm font-semibold">{step.id}</span>
+                    <span className="text-base font-semibold">{step.id}</span>
                   )}
-                </div>
+                </motion.div>
 
                 {/* ステップ情報 */}
-                <div className="mt-2 text-center">
+                <div className="mt-3 text-center">
                   <p
                     className={cn(
                       "text-sm font-medium",

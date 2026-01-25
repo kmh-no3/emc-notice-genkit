@@ -11,6 +11,7 @@ import { PresetSelector } from "@/components/PresetSelector";
 import { WelcomeCard } from "@/components/WelcomeCard";
 import { StepIndicator } from "@/components/StepIndicator";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { FadeIn } from "@/components/animations/FadeIn";
 import type { NoticeInput } from "@/lib/densai/schema";
 import { generateNoticeXml } from "@/lib/densai/generate";
 import { getCurrentDate } from "@/lib/densai/format";
@@ -178,10 +179,11 @@ export default function Home() {
   }
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 max-w-6xl">
-      <div className="space-y-8">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 max-w-6xl">
+      <div className="space-y-12">
         {/* ヘッダ */}
-        <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
+        <FadeIn>
+          <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
           <div className="space-y-3 flex-1">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
               でんさい通知XML テストデータ生成ツール
@@ -193,7 +195,8 @@ export default function Home() {
           <div className="self-start sm:self-auto">
             <ThemeToggle />
           </div>
-        </div>
+          </div>
+        </FadeIn>
 
         {/* ウェルカムカード（初回訪問時のみ） */}
         {isFirstVisit && (
@@ -204,35 +207,40 @@ export default function Home() {
         )}
 
         {/* ステップインジケーター */}
-        <StepIndicator
-          steps={steps}
-          currentStep={currentStep}
-          completedSteps={completedSteps}
-        />
+        <FadeIn delay={0.1}>
+          <StepIndicator
+            steps={steps}
+            currentStep={currentStep}
+            completedSteps={completedSteps}
+          />
+        </FadeIn>
 
         {/* プリセット選択とアクション */}
-        <Card>
-          <CardHeader>
-            <CardTitle>クイックアクション</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <PresetSelector onSelect={handlePresetSelect} />
-            <div className="flex gap-2">
-              <Button onClick={handleGenerate}>XML生成</Button>
-              <Button variant="outline" onClick={handleClear}>
-                データをクリア
-              </Button>
-            </div>
-            {error && (
-              <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
-                <strong>エラー:</strong> {error}
+        <FadeIn delay={0.2}>
+          <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+            <CardHeader>
+              <CardTitle>クイックアクション</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <PresetSelector onSelect={handlePresetSelect} />
+              <div className="flex gap-3">
+                <Button size="lg" onClick={handleGenerate}>XML生成</Button>
+                <Button size="lg" variant="outline" onClick={handleClear}>
+                  データをクリア
+                </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
+              {error && (
+                <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">
+                  <strong>エラー:</strong> {error}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
 
         {/* メインコンテンツ */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "form" | "preview")} className="w-full">
+        <FadeIn delay={0.3}>
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "form" | "preview")} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="form">入力フォーム</TabsTrigger>
             <TabsTrigger value="preview">XMLプレビュー</TabsTrigger>
@@ -267,6 +275,7 @@ export default function Home() {
             )}
           </TabsContent>
         </Tabs>
+        </FadeIn>
 
         {/* フッター */}
         <Card>

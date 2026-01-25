@@ -25,7 +25,7 @@ export function HeaderForm({ value, onChange }: HeaderFormProps) {
           通知日と通知先の情報を入力してください
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         <FieldWithTooltip
           label="通知日"
           tooltip="XMLの通知日を8桁のYYYYMMDD形式で入力（例: 20260125）"

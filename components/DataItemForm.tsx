@@ -86,7 +86,7 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h2 className="text-xl font-semibold">明細データ</h2>
@@ -111,7 +111,7 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
               {item.kiroku_no && ` - ${item.kiroku_no}`}
             </AccordionTrigger>
             <AccordionContent>
-              <div className="space-y-4 p-4">
+              <div className="space-y-5 p-4">
                 <div className="flex justify-end">
                   <Button
                     variant="destructive"
@@ -224,7 +224,7 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
                   </div>
                 </div>
 
-                <div className="rounded-lg border p-4 space-y-4">
+                <div className="rounded-lg border p-4 space-y-5">
                   <h4 className="font-semibold text-sm">
                     伝票特定補助フィールド（任意）
                   </h4>
