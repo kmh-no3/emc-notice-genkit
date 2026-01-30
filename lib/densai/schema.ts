@@ -39,3 +39,39 @@ export const noticeSchema = z.object({
 });
 
 export type Notice = z.infer<typeof noticeSchema>;
+
+// UI/フォーム用入力スキーマ（notice_date, notify_inf, data, encoding 形式）
+const notifyInfSchema = z.object({
+  riyosya_no: z.string().optional(),
+  riyosya_name: z.string().min(1, "利用者名は必須です"),
+  bank_cd: z.string().optional().refine((v) => v === undefined || v === "" || /^\d{4}$/.test(v), "銀行コードは4桁の数字で入力してください"),
+  bank_name: z.string().optional(),
+  shiten_cd: z.string().optional(),
+  shiten_name: z.string().optional(),
+  koza_sbt_cd: z.string().optional(),
+  koza_no: z.string().optional(),
+});
+
+const dataItemSchema = z.object({
+  notice_cd: z.string().optional(),
+  obligation_inf: z.record(z.unknown()).optional(),
+  entitled_inf: z.record(z.unknown()).optional(),
+  saiken_kingaku: z.string().optional(),
+  shiharai_kijitsu: z.string().optional(),
+  kiroku_no: z.string().optional(),
+  kiroku_date: z.string().optional(),
+  bukrs: z.string().optional(),
+  belnr: z.string().optional(),
+  gjahr: z.string().optional(),
+});
+
+export const NoticeInputSchema = z.object({
+  header: z.object({
+    notice_date: z.string().regex(/^\d{8}$/, "日付は8桁（YYYYMMDD）で入力してください"),
+    notify_inf: notifyInfSchema,
+  }),
+  data: z.array(dataItemSchema),
+  encoding: z.string().optional(),
+});
+
+export type NoticeInput = z.infer<typeof NoticeInputSchema>;

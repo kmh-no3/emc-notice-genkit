@@ -75,9 +75,9 @@ export function formatItemCount(count: number): string {
 }
 
 /**
- * 伝票番号を10桁にフォーマット（左詰め、右側0埋め）
+ * 伝票番号を10桁にフォーマット（左0埋め）
  */
 export function formatBelnr(belnr: string | undefined): string {
   if (!belnr) return "";
-  return belnr.padEnd(10, "0").substring(0, 10);
+  return belnr.padStart(10, "0").substring(0, 10);
 }

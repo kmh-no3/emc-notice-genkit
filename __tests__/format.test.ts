@@ -1,36 +1,23 @@
 import { describe, it, expect } from "vitest";
 import {
-  padLeft,
-  formatKozaNo,
+  formatAccountNumber,
   formatBelnr,
   formatDate,
   generateIraininRefNo,
-  formatSumNum,
-  formatSumAmnt,
+  formatItemCount,
+  formatAmount,
 } from "@/lib/densai/format";
 
 describe("format.ts", () => {
-  describe("padLeft", () => {
-    it("左側を0で埋める", () => {
-      expect(padLeft("123", 5)).toBe("00123");
-      expect(padLeft("1", 7)).toBe("0000001");
-    });
-
-    it("指定文字で埋める", () => {
-      expect(padLeft("abc", 5, "x")).toBe("xxabc");
-    });
-
-    it("既に長さが足りている場合はそのまま", () => {
-      expect(padLeft("12345", 5)).toBe("12345");
-      expect(padLeft("123456", 5)).toBe("123456");
-    });
-  });
-
-  describe("formatKozaNo", () => {
+  describe("formatAccountNumber", () => {
     it("口座番号を7桁に左0埋め", () => {
-      expect(formatKozaNo("1")).toBe("0000001");
-      expect(formatKozaNo("123")).toBe("0000123");
-      expect(formatKozaNo("1234567")).toBe("1234567");
+      expect(formatAccountNumber("1")).toBe("0000001");
+      expect(formatAccountNumber("123")).toBe("0000123");
+      expect(formatAccountNumber("1234567")).toBe("1234567");
+    });
+
+    it("数字以外を除去して7桁に", () => {
+      expect(formatAccountNumber("1-2-3")).toBe("0000123");
     });
   });
 
@@ -43,14 +30,18 @@ describe("format.ts", () => {
   });
 
   describe("formatDate", () => {
-    it("日付をYYYYMMDD形式に変換", () => {
-      const date = new Date("2026-01-25");
-      expect(formatDate(date)).toBe("20260125");
+    it("日付をYYYYMMDD形式に変換（8桁はそのまま）", () => {
+      expect(formatDate("20260125")).toBe("20260125");
     });
 
-    it("月と日が1桁の場合は0埋めされる", () => {
-      const date = new Date("2026-03-05");
-      expect(formatDate(date)).toBe("20260305");
+    it("ハイフン・スラッシュを除去して8桁に", () => {
+      expect(formatDate("2026-01-25")).toBe("20260125");
+      expect(formatDate("2026/03/05")).toBe("20260305");
+    });
+
+    it("不正な場合はundefined", () => {
+      expect(formatDate("2026125")).toBeUndefined();
+      expect(formatDate("")).toBeUndefined();
     });
   });
 
@@ -85,19 +76,23 @@ describe("format.ts", () => {
     });
   });
 
-  describe("formatSumNum", () => {
+  describe("formatItemCount", () => {
     it("明細件数を6桁に左0埋め", () => {
-      expect(formatSumNum(1)).toBe("000001");
-      expect(formatSumNum(123)).toBe("000123");
-      expect(formatSumNum(999999)).toBe("999999");
+      expect(formatItemCount(1)).toBe("000001");
+      expect(formatItemCount(123)).toBe("000123");
+      expect(formatItemCount(999999)).toBe("999999");
     });
   });
 
-  describe("formatSumAmnt", () => {
+  describe("formatAmount", () => {
     it("合計金額を12桁に左0埋め", () => {
-      expect(formatSumAmnt(10000)).toBe("000000010000");
-      expect(formatSumAmnt(1234567890)).toBe("001234567890");
-      expect(formatSumAmnt(999999999999)).toBe("999999999999");
+      expect(formatAmount(10000)).toBe("000000010000");
+      expect(formatAmount(1234567890)).toBe("001234567890");
+      expect(formatAmount(999999999999)).toBe("999999999999");
+    });
+
+    it("文字列も受け付ける", () => {
+      expect(formatAmount("10000")).toBe("000000010000");
     });
   });
 });
