@@ -2,7 +2,8 @@
 
 SAP S/4HANA 日本EMC関連（EMC_JP / RFFOJP_EMC）向けの、でんさい（densai.net）標準フォーマット通知XMLテストデータを生成するWebアプリケーションです。
 
-**🌐 デモサイト**: `https://<GitHubのユーザー名>.github.io/emc-notice-genkit/`（GitHub Pages）
+**🌐 デモサイト**: `https://<GitHubのユーザー名>.github.io/emc-notice-genkit/`（GitHub Pages）  
+**📦 リポジトリ**: [https://github.com/kmh-no3/emc-notice-genkit](https://github.com/kmh-no3/emc-notice-genkit)
 
 ## 概要
 
@@ -141,4 +142,4 @@ XML生成後、同じアコーディオン内または下に表示される「XM
 
 ## 貢献・サポート
 
-バグ報告や機能要望は、GitHubのIssuesで受け付けています。
+バグ報告や機能要望は、[GitHubのIssues](https://github.com/kmh-no3/emc-notice-genkit/issues)で受け付けています。

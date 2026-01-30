@@ -1,57 +1,98 @@
-"use client"
-
 import * as React from "react"
-import * as AccordionPrimitive from "@radix-ui/react-accordion"
-import { ChevronDown } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 
-const Accordion = AccordionPrimitive.Root
+interface AccordionContextValue {
+  value: string | null
+  onValueChange: (value: string | null) => void
+}
+
+const AccordionContext = React.createContext<AccordionContextValue | undefined>(undefined)
+
+const Accordion = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    type?: "single" | "multiple"
+    defaultValue?: string
+    value?: string
+    onValueChange?: (value: string | null) => void
+  }
+>(({ className, type = "single", defaultValue, value, onValueChange, ...props }, ref) => {
+  const [internalValue, setInternalValue] = React.useState<string | null>(defaultValue || null)
+  const currentValue = value !== undefined ? value : internalValue
+  const handleValueChange = onValueChange || setInternalValue
+
+  return (
+    <AccordionContext.Provider value={{ value: currentValue, onValueChange: handleValueChange }}>
+      <div ref={ref} className={cn("space-y-2", className)} {...props} />
+    </AccordionContext.Provider>
+  )
+})
+Accordion.displayName = "Accordion"
 
 const AccordionItem = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>
->(({ className, ...props }, ref) => (
-  <AccordionPrimitive.Item
-    ref={ref}
-    className={cn("border-b", className)}
-    {...props}
-  />
-))
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    value: string
+  }
+>(({ className, value, ...props }, ref) => {
+  const context = React.useContext(AccordionContext)
+  if (!context) throw new Error("AccordionItem must be used within Accordion")
+  
+  const isOpen = context.value === value
+  
+  return (
+    <div
+      ref={ref}
+      className={cn("border-b", className)}
+      {...props}
+    />
+  )
+})
 AccordionItem.displayName = "AccordionItem"
 
 const AccordionTrigger = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Header className="flex">
-    <AccordionPrimitive.Trigger
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, children, ...props }, ref) => {
+  const context = React.useContext(AccordionContext)
+  if (!context) throw new Error("AccordionTrigger must be used within Accordion")
+  
+  return (
+    <button
       ref={ref}
+      type="button"
       className={cn(
-        "flex flex-1 items-center justify-between py-4 text-sm font-medium transition-all hover:underline text-left [&[data-state=open]>svg]:rotate-180",
+        "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
         className
       )}
       {...props}
     >
       {children}
-      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-))
-AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
+    </button>
+  )
+})
+AccordionTrigger.displayName = "AccordionTrigger"
 
 const AccordionContent = React.forwardRef<
-  React.ElementRef<typeof AccordionPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <AccordionPrimitive.Content
-    ref={ref}
-    className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
-    {...props}
-  >
-    <div className={cn("pb-4 pt-0", className)}>{children}</div>
-  </AccordionPrimitive.Content>
-))
-AccordionContent.displayName = AccordionPrimitive.Content.displayName
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
+  const context = React.useContext(AccordionContext)
+  if (!context) throw new Error("AccordionContent must be used within Accordion")
+  
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+})
+AccordionContent.displayName = "AccordionContent"
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }

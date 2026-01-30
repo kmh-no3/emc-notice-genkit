@@ -1,161 +1,86 @@
 import { create } from "xmlbuilder2";
-import type { NoticeInput, Party, NoticeItem } from "./schema";
-import {
-  formatKozaNo,
-  formatSumNum,
-  formatSumAmnt,
-  generateIraininRefNo,
-} from "./format";
-import { validateNoticeInput, parseAmount } from "./validate";
+import type { Header, Notify, Item } from "./schema";
+import { formatAmount, formatAccountNumber, formatItemCount, formatBelnr } from "./format";
 
 /**
- * XML生成結果
+ * irainin_ref_noを自動生成
  */
-export interface GenerateResult {
-  success: boolean;
-  xml?: string;
-  error?: string;
+function generateIraininRefNo(header: Header): string {
+  if (header.irainin_ref_no) {
+    return header.irainin_ref_no;
+  }
+  const belnr = formatBelnr(header.belnr);
+  return `${header.bukrs}${belnr}${header.gjahr}`;
 }
 
 /**
- * でんさい通知XMLを生成
- * @param input - 入力データ
- * @returns 生成されたXML文字列またはエラー
+ * XMLを生成
  */
-export function generateNoticeXml(input: NoticeInput): GenerateResult {
-  try {
-    // バリデーション
-    const validation = validateNoticeInput(input);
-    if (!validation.success) {
-      return {
-        success: false,
-        error: validation.errors?.map((e) => e.message).join(", "),
-      };
-    }
+export function generateNoticeXml(header: Header, notify: Notify, items: Item[]): string {
+  const root = create({ version: "1.0", encoding: "UTF-8" })
+    .ele("notice_ACR")
+    .ele("ASG")
+    .ele("DIV");
 
-    const validatedInput = validation.data!;
-
-    // 合計値の計算
-    const sumNum = validatedInput.data.length;
-    const sumAmnt = validatedInput.data.reduce((total, item) => {
-      return total + parseAmount(item.saiken_kingaku);
-    }, 0);
-
-    // XMLドキュメント作成
-    const doc = create({ version: "1.0", encoding: validatedInput.encoding })
-      .ele("notice_ACR.ASG.DIV");
-
-    // ヘッダ情報
-    const headerInf = doc.ele("header_inf");
-    headerInf.ele("notice_date").txt(validatedInput.header.notice_date);
-
-    const notifyInf = headerInf.ele("notify_inf");
-    buildPartyElement(notifyInf, validatedInput.header.notify_inf, true);
-
-    // データ部（明細）
-    validatedInput.data.forEach((item) => {
-      const dataInf = doc.ele("data_inf");
-      buildDataInfElement(dataInf, item);
-    });
-
-    // トレーラ情報
-    const trailerInf = doc.ele("trailer_inf");
-    trailerInf.ele("sum_num").txt(formatSumNum(sumNum));
-    trailerInf.ele("sum_amnt").txt(formatSumAmnt(sumAmnt));
-
-    // XML文字列として出力
-    const xml = doc.end({ prettyPrint: true });
-
-    return {
-      success: true,
-      xml,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "XML生成中に予期しないエラーが発生しました",
-    };
+  // ヘッダー情報
+  const headerEl = root.ele("header");
+  headerEl.ele("bukrs").txt(header.bukrs);
+  headerEl.ele("belnr").txt(header.belnr);
+  headerEl.ele("gjahr").txt(header.gjahr);
+  
+  if (header.budat) {
+    headerEl.ele("budat").txt(header.budat);
   }
-}
+  
+  const iraininRefNo = generateIraininRefNo(header);
+  headerEl.ele("irainin_ref_no").txt(iraininRefNo);
 
-/**
- * 当事者情報要素を構築
- * @param parent - 親要素
- * @param party - 当事者情報
- * @param isNotify - 通知先情報かどうか
- */
-function buildPartyElement(
-  parent: any,
-  party: Party & { riyosya_no?: string },
-  isNotify: boolean = false
-): void {
-  // 通知先の場合のみ利用者番号を出力
-  if (isNotify && party.riyosya_no) {
-    parent.ele("riyosya_no").txt(party.riyosya_no);
+  // 通知先情報
+  const notifyEl = root.ele("notify");
+  if (notify.ginko_cd) {
+    notifyEl.ele("ginko_cd").txt(notify.ginko_cd);
   }
-
-  parent.ele("riyosya_name").txt(party.riyosya_name);
-  parent.ele("bank_cd").txt(party.bank_cd);
-
-  // 任意項目：銀行名
-  if (party.bank_name) {
-    parent.ele("bank_name").txt(party.bank_name);
+  if (notify.shiten_cd) {
+    notifyEl.ele("shiten_cd").txt(notify.shiten_cd);
   }
-
-  parent.ele("shiten_cd").txt(party.shiten_cd);
-
-  // 任意項目：支店名
-  if (party.shiten_name) {
-    parent.ele("shiten_name").txt(party.shiten_name);
-  }
-
-  parent.ele("koza_sbt_cd").txt(party.koza_sbt_cd);
-  parent.ele("koza_no").txt(formatKozaNo(party.koza_no));
-}
-
-/**
- * データ部要素を構築
- * @param dataInf - data_inf要素
- * @param item - 明細データ
- */
-function buildDataInfElement(dataInf: any, item: NoticeItem): void {
-  dataInf.ele("notice_cd").txt(item.notice_cd);
-
-  // 義務者情報
-  const obligationInf = dataInf.ele("obligation_inf");
-  buildPartyElement(obligationInf, item.obligation_inf);
-
-  // 権利者情報
-  const entitledInf = dataInf.ele("entitled_inf");
-  buildPartyElement(entitledInf, item.entitled_inf);
-
-  // 金額・期日等
-  dataInf.ele("saiken_kingaku").txt(item.saiken_kingaku);
-  dataInf.ele("shiharai_kijitsu").txt(item.shiharai_kijitsu);
-  dataInf.ele("kiroku_no").txt(item.kiroku_no);
-
-  // 依頼人Ref.No.の生成または直接使用
-  let iraininRefNo = item.irainin_ref_no;
-  if (!iraininRefNo && item.bukrs && item.belnr && item.gjahr) {
-    try {
-      iraininRefNo = generateIraininRefNo(item.bukrs, item.belnr, item.gjahr);
-    } catch (error) {
-      // エラーの場合はスキップ（iraininRefNoは任意項目）
-      console.warn("irainin_ref_no生成エラー:", error);
+  if (notify.koza_no) {
+    const formattedKoza = formatAccountNumber(notify.koza_no);
+    if (formattedKoza) {
+      notifyEl.ele("koza_no").txt(formattedKoza);
     }
   }
-
-  if (iraininRefNo) {
-    dataInf.ele("irainin_ref_no").txt(iraininRefNo);
+  if (notify.koza_mei) {
+    notifyEl.ele("koza_mei").txt(notify.koza_mei);
   }
 
-  dataInf.ele("kiroku_date").txt(item.kiroku_date);
+  // サマリー情報
+  const sumEl = root.ele("summary");
+  const sumNum = formatItemCount(items.length);
+  sumEl.ele("sum_num").txt(sumNum);
+  
+  const totalAmount = items.reduce((sum, item) => {
+    const amount = item.kingaku ? parseInt(item.kingaku, 10) : 0;
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
+  const sumAmnt = formatAmount(totalAmount);
+  sumEl.ele("sum_amnt").txt(sumAmnt);
 
-  // 任意項目：取消区分
-  if (item.cancel_inf) {
-    dataInf.ele("cancel_inf").txt(item.cancel_inf);
-  }
+  // 明細情報
+  const dataEl = root.ele("data");
+  items.forEach((item) => {
+    const itemEl = dataEl.ele("item");
+    
+    if (item.kingaku) {
+      itemEl.ele("kingaku").txt(formatAmount(item.kingaku));
+    }
+    if (item.tekiyo) {
+      itemEl.ele("tekiyo").txt(item.tekiyo);
+    }
+    if (item.date) {
+      itemEl.ele("date").txt(item.date);
+    }
+  });
+
+  const xml = root.end({ prettyPrint: true });
+  return xml;
 }
