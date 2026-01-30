@@ -5,7 +5,9 @@ SAP S/4HANA 日本EMC関連（EMC_JP / RFFOJP_EMC）向けの、でんさい（d
 **🌐 デモサイト**: [https://kmh-no3.github.io/emc-notice-genkit/](https://kmh-no3.github.io/emc-notice-genkit/)（GitHub Pages）  
 **📦 リポジトリ**: [https://github.com/kmh-no3/emc-notice-genkit](https://github.com/kmh-no3/emc-notice-genkit)
 
-> **ツールが表示されない場合**: リポジトリの **Settings** → **Pages** → **Build and deployment** で **Source** を **「GitHub Actions」** に設定してください。ブランチからデプロイしているとリポジトリのページが表示されます。
+> **GitHub Pages でローカルと同じツールを表示するには**
+> 1. リポジトリの **Settings** → **Pages** → **Build and deployment** で **Source** を **「GitHub Actions」** に設定する。
+> 2. `main` ブランチにプッシュすると、ワークフローがビルド・デプロイし、数分後に https://kmh-no3.github.io/emc-notice-genkit/ でツールが表示される。
 
 ## 概要
 

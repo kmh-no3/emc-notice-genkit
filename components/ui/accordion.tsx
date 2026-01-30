@@ -12,11 +12,12 @@ const Accordion = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
     type?: "single" | "multiple"
+    collapsible?: boolean
     defaultValue?: string
     value?: string
     onValueChange?: (value: string | null) => void
   }
->(({ className, type = "single", defaultValue, value, onValueChange, ...props }, ref) => {
+>(({ className, type = "single", collapsible: _collapsible, defaultValue, value, onValueChange, ...props }, ref) => {
   const [internalValue, setInternalValue] = React.useState<string | null>(defaultValue || null)
   const currentValue = value !== undefined ? value : internalValue
   const handleValueChange = onValueChange || setInternalValue

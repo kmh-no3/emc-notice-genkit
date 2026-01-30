@@ -3,6 +3,38 @@
  */
 
 /**
+ * 現在日付をYYYYMMDD形式で返す
+ */
+export function getCurrentDate(): string {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}${m}${d}`;
+}
+
+/**
+ * 依頼人Ref.No.を生成（BUKRS 4桁 + BELNR 10桁0埋め + GJAHR 4桁 = 18桁）
+ */
+export function generateIraininRefNo(
+  bukrs: string,
+  belnr: string,
+  gjahr: string
+): string {
+  if (!/^\d{4}$/.test(bukrs)) {
+    throw new Error("BUKRSは4桁である必要があります");
+  }
+  if (!/^\d{4}$/.test(gjahr)) {
+    throw new Error("GJAHRは4桁である必要があります");
+  }
+  if (!/^\d{1,10}$/.test(belnr)) {
+    throw new Error("BELNRは1〜10桁の数字である必要があります");
+  }
+  const belnrPadded = belnr.padStart(10, "0");
+  return `${bukrs}${belnrPadded}${gjahr}`;
+}
+
+/**
  * 日付を8桁形式（YYYYMMDD）にフォーマット
  */
 export function formatDate(date: string | undefined): string | undefined {
