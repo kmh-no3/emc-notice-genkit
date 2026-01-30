@@ -9,12 +9,6 @@ interface FlowSectionProps {
 }
 
 export function FlowSection({ currentStep, completedSteps, onNavigate }: FlowSectionProps) {
-  const steps = [
-    { id: 1, label: "データ入力" },
-    { id: 2, label: "XML生成" },
-    { id: 3, label: "ダウンロード" },
-  ];
-
   const handleClick = () => {
     if (onNavigate) {
       onNavigate("section-flow");
@@ -31,24 +25,42 @@ export function FlowSection({ currentStep, completedSteps, onNavigate }: FlowSec
       >
         <span className="text-lg">■</span>フロー
       </Button>
-      <ol className="space-y-2 text-sm">
-        {steps.map((step) => {
-          const isCompleted = completedSteps.has(step.id);
-          const isCurrent = currentStep === step.id;
-          
-          return (
-            <li 
-              key={step.id} 
-              className={`
-                ${isCompleted ? "text-primary font-medium" : ""}
-                ${isCurrent ? "text-foreground font-medium" : ""}
-                ${!isCompleted && !isCurrent ? "text-muted-foreground" : ""}
-              `}
-            >
-              {step.id}. {step.label}
-            </li>
-          );
-        })}
+      <ol className="space-y-1 list-none text-black dark:text-white">
+        {/* 1. サンプル */}
+        <li className="block text-base font-medium">
+          ① サンプル
+        </li>
+        {/* 2. データ入力 ＋ 1.〜3. 子項目 */}
+        <li className="space-y-1">
+          <span
+            className={`block text-base ${
+              completedSteps.has(1) || currentStep === 1 ? "font-semibold" : "font-medium"
+            }`}
+          >
+            ② データ入力
+          </span>
+          <ol className="ml-4 space-y-0.5 list-none text-sm text-muted-foreground dark:text-muted-foreground">
+            <li>1. ヘッダ情報</li>
+            <li>2. 通知先情報</li>
+            <li>3. 明細情報</li>
+          </ol>
+        </li>
+        {/* 3. XML生成 */}
+        <li
+          className={`block text-base ${
+            completedSteps.has(2) || currentStep === 2 ? "font-semibold" : "font-medium"
+          }`}
+        >
+          ③ XML生成
+        </li>
+        {/* 4. ダウンロード */}
+        <li
+          className={`block text-base ${
+            completedSteps.has(3) || currentStep === 3 ? "font-semibold" : "font-medium"
+          }`}
+        >
+          ④ ダウンロード
+        </li>
       </ol>
     </div>
   );

@@ -18,16 +18,11 @@ export function HeaderForm({ value, onChange }: HeaderFormProps) {
 
   return (
     <div className="space-y-10 w-full max-w-full overflow-hidden">
-      <div className="border-t border-border pt-10 pb-4">
-        <h2 className="text-2xl font-semibold tracking-tight mb-4">
-          データ入力
-        </h2>
-      </div>
       {/* ①ヘッダ情報 */}
       <section id="form-header" className="scroll-mt-24 w-full max-w-full pb-4">
         <div className="space-y-4">
           <div>
-            <h3 className="text-2xl font-semibold tracking-tight mb-2">
+            <h3 className="text-lg font-semibold tracking-tight mb-2">
               ①ヘッダ情報
             </h3>
             <p className="text-sm text-muted-foreground">

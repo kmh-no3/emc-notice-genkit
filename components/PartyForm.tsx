@@ -44,7 +44,7 @@ export function PartyForm({
   return (
     <div className="space-y-4 sm:space-y-5 w-full max-w-full overflow-hidden border-b border-border pb-6">
       <div className="flex items-center justify-between w-full max-w-full min-w-0 mb-4">
-        <h3 className="text-2xl font-semibold tracking-tight truncate min-w-0 flex-1">{label}</h3>
+        <h3 className="text-lg font-semibold tracking-tight truncate min-w-0 flex-1">{label}</h3>
         <ProgressBadge current={filledRequired} total={requiredFields} className="shrink-0" />
       </div>
 

@@ -22,7 +22,7 @@ interface SidebarProps {
   hasXml: boolean;
   xml: string;
   onOpenPreview: () => void;
-  onNavigateToSection: (sectionId: "form-header" | "form-notify" | "form-items" | "section-flow" | "section-quick-action" | "section-xml-actions") => void;
+  onNavigateToSection: (sectionId: string) => void;
 }
 
 export function Sidebar({
