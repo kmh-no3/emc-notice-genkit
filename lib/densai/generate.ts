@@ -1,6 +1,8 @@
 import { create } from "xmlbuilder2";
-import type { Header, Notify, Item } from "./schema";
+import { nanoid } from "nanoid";
+import type { Header, Notify, Item, NoticeInput } from "./schema";
 import { formatAmount, formatAccountNumber, formatItemCount, formatBelnr } from "./format";
+import { validateNoticeInput, formatValidationErrors } from "./validate";
 
 /**
  * irainin_ref_noを自動生成
@@ -83,4 +85,55 @@ export function generateNoticeXml(header: Header, notify: Notify, items: Item[])
 
   const xml = root.end({ prettyPrint: true });
   return xml;
+}
+
+/**
+ * NoticeInput（UI形式）からXMLを生成する。
+ * バリデーション後、Header/Notify/Itemに変換してgenerateNoticeXmlを呼ぶ。
+ */
+export function generateNoticeXmlFromInput(
+  input: NoticeInput
+): { success: true; xml: string } | { success: false; error: string } {
+  const validated = validateNoticeInput(input);
+  if (!validated.success || !validated.data) {
+    const message =
+      validated.errors && validated.errors.length > 0
+        ? formatValidationErrors(validated.errors)
+        : "入力データが不正です";
+    return { success: false, error: message };
+  }
+
+  const { header: headerInput, data } = validated.data;
+  const first = data[0];
+  const currentYear = new Date().getFullYear().toString();
+
+  const header: Header = {
+    bukrs: first?.bukrs ?? "1000",
+    belnr: first?.belnr ?? "0000000001",
+    gjahr: first?.gjahr ?? currentYear,
+    budat: headerInput.notice_date,
+    irainin_ref_no: undefined,
+  };
+
+  const notify: Notify = {
+    ginko_cd: headerInput.notify_inf.bank_cd || undefined,
+    shiten_cd: headerInput.notify_inf.shiten_cd || undefined,
+    koza_no: headerInput.notify_inf.koza_no || undefined,
+    koza_mei: headerInput.notify_inf.riyosya_name || undefined,
+  };
+
+  const items: Item[] = data.map((d, i) => ({
+    id: d.kiroku_no ?? nanoid(),
+    kingaku: d.saiken_kingaku,
+    tekiyo: (d as { tekiyo?: string }).tekiyo,
+    date: d.kiroku_date,
+  }));
+
+  try {
+    const xml = generateNoticeXml(header, notify, items);
+    return { success: true, xml };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "XML生成に失敗しました";
+    return { success: false, error: message };
+  }
 }

@@ -17,7 +17,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type { NoticeInput } from "@/lib/densai/schema";
-import { generateNoticeXml } from "@/lib/densai/generate";
+import { generateNoticeXmlFromInput } from "@/lib/densai/generate";
 import { getCurrentDate } from "@/lib/densai/format";
 import {
   saveToLocalStorage,
@@ -80,7 +80,7 @@ export default function Home() {
 
   // XML生成
   const handleGenerate = useCallback(() => {
-    const result = generateNoticeXml(input);
+    const result = generateNoticeXmlFromInput(input);
     if (result.success && result.xml) {
       setXml(result.xml);
       setError("");
@@ -91,10 +91,11 @@ export default function Home() {
         description: "XMLプレビューを確認できます",
       });
     } else {
-      setError(result.error || "XML生成に失敗しました");
+      const errorMessage = result.success ? "XML生成に失敗しました" : result.error;
+      setError(errorMessage);
       setXml("");
       toast.error("XML生成に失敗しました", {
-        description: result.error,
+        description: errorMessage,
       });
     }
   }, [input, completeStep, goToStep]);
@@ -322,7 +323,7 @@ export default function Home() {
               {/* サンプル・データ入力・XML生成をアコーディオンで開閉 */}
               <Accordion
                 type="multiple"
-                defaultValue={[]}
+                defaultValue={undefined}
                 className="w-full border-t border-border"
               >
                 <AccordionItem value="sample" className="border-b border-border">

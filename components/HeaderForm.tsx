@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader, CardDescription } from "@/components/ui/
 import { Input } from "@/components/ui/input";
 import { PartyForm } from "./PartyForm";
 import { FieldWithTooltip } from "./FieldWithTooltip";
-import type { Header } from "@/lib/densai/schema";
+import type { NoticeInput } from "@/lib/densai/schema";
 
 interface HeaderFormProps {
-  value: Header;
-  onChange: (value: Header) => void;
+  value: NoticeInput["header"];
+  onChange: (value: NoticeInput["header"]) => void;
 }
 
 export function HeaderForm({ value, onChange }: HeaderFormProps) {

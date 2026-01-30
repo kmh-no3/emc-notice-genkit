@@ -20,8 +20,16 @@ import { Badge } from "@/components/ui/badge";
 import { PartyForm } from "./PartyForm";
 import { EmptyState } from "./EmptyState";
 import { FieldWithTooltip } from "./FieldWithTooltip";
-import type { NoticeItem } from "@/lib/densai/schema";
+import type { NoticeItem, Party } from "@/lib/densai/schema";
 import { generateIraininRefNo } from "@/lib/densai/format";
+
+const defaultParty: Party & { riyosya_no?: string } = {
+  riyosya_name: "",
+  bank_cd: "",
+  shiten_cd: "",
+  koza_sbt_cd: "1",
+  koza_no: "",
+};
 
 interface DataItemFormProps {
   items: NoticeItem[];
@@ -148,13 +156,13 @@ export function DataItemForm({ items, onChange, onLoadSample }: DataItemFormProp
 
                 <PartyForm
                   label="義務者情報"
-                  value={item.obligation_inf}
+                  value={item.obligation_inf ?? defaultParty}
                   onChange={(v) => handleItemChange(index, "obligation_inf", v)}
                 />
 
                 <PartyForm
                   label="権利者情報"
-                  value={item.entitled_inf}
+                  value={item.entitled_inf ?? defaultParty}
                   onChange={(v) => handleItemChange(index, "entitled_inf", v)}
                 />
 

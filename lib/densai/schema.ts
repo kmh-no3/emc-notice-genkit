@@ -41,7 +41,7 @@ export const noticeSchema = z.object({
 export type Notice = z.infer<typeof noticeSchema>;
 
 // UI/フォーム用入力スキーマ（notice_date, notify_inf, data, encoding 形式）
-const notifyInfSchema = z.object({
+export const notifyInfSchema = z.object({
   riyosya_no: z.string().optional(),
   riyosya_name: z.string().min(1, "利用者名は必須です"),
   bank_cd: z.string().optional().refine((v) => v === undefined || v === "" || /^\d{4}$/.test(v), "銀行コードは4桁の数字で入力してください"),
@@ -52,10 +52,13 @@ const notifyInfSchema = z.object({
   koza_no: z.string().optional(),
 });
 
+/** 通知先・義務者・権利者などフォーム用（notify_inf と同じ形状） */
+export type Party = z.infer<typeof notifyInfSchema>;
+
 const dataItemSchema = z.object({
   notice_cd: z.string().optional(),
-  obligation_inf: z.record(z.unknown()).optional(),
-  entitled_inf: z.record(z.unknown()).optional(),
+  obligation_inf: notifyInfSchema.optional(),
+  entitled_inf: notifyInfSchema.optional(),
   saiken_kingaku: z.string().optional(),
   shiharai_kijitsu: z.string().optional(),
   kiroku_no: z.string().optional(),
@@ -63,7 +66,12 @@ const dataItemSchema = z.object({
   bukrs: z.string().optional(),
   belnr: z.string().optional(),
   gjahr: z.string().optional(),
+  tekiyo: z.string().optional(),
+  irainin_ref_no: z.string().optional(),
 });
+
+/** UI/フォーム用の明細1件（data 配列の要素） */
+export type NoticeItem = z.infer<typeof dataItemSchema>;
 
 export const NoticeInputSchema = z.object({
   header: z.object({
