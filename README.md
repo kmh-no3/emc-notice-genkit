@@ -5,9 +5,9 @@ SAP S/4HANA 日本EMC関連（EMC_JP / RFFOJP_EMC）向けの、でんさい（d
 **🌐 デモサイト**: [https://kmh-no3.github.io/emc-notice-genkit/](https://kmh-no3.github.io/emc-notice-genkit/)（GitHub Pages）  
 **📦 リポジトリ**: [https://github.com/kmh-no3/emc-notice-genkit](https://github.com/kmh-no3/emc-notice-genkit)
 
-> **GitHub Pages で公開するには（Actions を使わない方法）**
-> 1. リポジトリの **Settings** → **Pages** → **Build and deployment** で **Source** を **「Deploy from a branch」** にし、**Branch** を `gh-pages`、**Folder** を `/ (root)` に設定する。
-> 2. ローカルで `npm install` → `npm run deploy` を実行する。ビルド結果が `gh-pages` ブランチにプッシュされ、数分後に https://kmh-no3.github.io/emc-notice-genkit/ で表示される。以降の更新も同じく `npm run deploy` で反映できる。
+> **GitHub Pages で公開するには**
+> - **プッシュで自動ビルド・デプロイ**: **Settings** → **Pages** → **Source** を **「GitHub Actions」** に設定する。`main` へプッシュするとワークフローがテスト・ビルド・デプロイし、数分後に https://kmh-no3.github.io/emc-notice-genkit/ に反映される。
+> - **手動デプロイ**: Source を **「Deploy from a branch」**、Branch を `gh-pages` にし、ローカルで `npm run deploy` を実行する。
 
 ## 概要
 
@@ -45,10 +45,17 @@ SAP S/4HANA 日本EMC関連（EMC_JP / RFFOJP_EMC）向けの、でんさい（d
 - **XML生成**: xmlbuilder2
 - **テスト**: Vitest
 
-## デプロイ（GitHub Pages・Actions なし）
+## デプロイ（GitHub Pages）
+
+### 方法A: プッシュで自動ビルド・デプロイ（推奨）
+
+1. **Settings** → **Pages** で **Source** を **GitHub Actions** に設定する。
+2. `main` ブランチへプッシュすると、ワークフローがテスト・ビルド・デプロイし、数分後に https://kmh-no3.github.io/emc-notice-genkit/ に反映される。
+
+### 方法B: 手動デプロイ（Deploy from a branch）
 
 1. **Settings** → **Pages** で **Source** を **Deploy from a branch**、**Branch** を `gh-pages`、**Folder** を `/ (root)` に設定する。
-2. ローカルで `npm install` のあと、`npm run deploy` を実行する。ビルド結果が `gh-pages` ブランチにプッシュされ、数分後に https://kmh-no3.github.io/emc-notice-genkit/ に反映される。
+2. ローカルで `npm install` のあと、`npm run deploy` を実行する。
 
 ## 使用方法
 
