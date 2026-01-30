@@ -4,7 +4,9 @@ const ONBOARDING_KEY = "densai-onboarding-completed";
 
 export function useOnboarding() {
   const [isFirstVisit, setIsFirstVisit] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // 静的エクスポート（GitHub Pages等）では初期HTMLがそのまま表示されるため、
+  // 初期値は false にし、本編を表示。useEffect で localStorage を読んで isFirstVisit を更新する
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // ローカルストレージをチェック
@@ -13,7 +15,6 @@ export function useOnboarding() {
       localStorage.getItem(ONBOARDING_KEY) === "true";
 
     setIsFirstVisit(!hasCompletedOnboarding);
-    setIsLoading(false);
   }, []);
 
   const completeOnboarding = () => {
